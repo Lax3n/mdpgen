@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Créer un compte</title></head>
+<body>
+  <h1>Inscription</h1>
+  <form id="form" action="done.html" method="get">
+    <label>Email <input type="email" id="email" name="email" required></label>
+    <label>Mot de passe <input type="password" id="password" name="password" autocomplete="new-password" required></label>
+    <label>Confirmer <input type="password" id="confirm" name="confirm" autocomplete="new-password" required></label>
+    <button type="submit" id="submit">Créer un compte</button>
+  </form>
+  <pre id="state"></pre>
+  <script>
+    // Pseudo-framework : l'état ne bouge que par les événements input, comme React.
+    const state = { password: '', confirm: '' };
+    window.__events = [];
+    for (const id of ['password', 'confirm']) {
+      const input = document.getElementById(id);
+      for (const type of ['input', 'change']) {
+        input.addEventListener(type, (event) => {
+          window.__events.push({ type, id, value: input.value, inputType: event.inputType ?? null });
+          if (type === 'input') { state[id] = input.value; document.getElementById('state').textContent = JSON.stringify(state); }
+        });
+      }
+    }
+  </script>
+</body>
+</html>

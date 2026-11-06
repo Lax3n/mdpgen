@@ -1,0 +1,12 @@
+{
+  "name": "mdpgen",
+  "version": "0.1.0",
+  "description": "MDP Gen en ligne de commande : mots de passe aléatoires, sans biais, sans dépendance",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "mdpgen": "dist/mdpgen.mjs" },
+  "files": ["dist"],
+  "engines": { "node": ">=20" },
+  "scripts": { "build": "node build.mjs" },
+  "dependencies": { "@mdpgen/core": "0.1.0" }
+}

@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Terminé</title></head>
+<body>
+  <h1>Formulaire reçu</h1>
+  <pre id="password"></pre>
+  <pre id="confirm"></pre>
+  <pre id="current"></pre>
+  <script>
+    const params = new URLSearchParams(location.search);
+    for (const id of ['password', 'confirm', 'current']) {
+      document.getElementById(id).textContent = params.get(id) ?? '';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "mdpgen-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MDP Gen : générateur de mots de passe aléatoires, extension Brave/Chrome et outil en ligne de commande",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @mdpgen/core && npm run build -w mdpgen && npm run build -w @mdpgen/extension",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "e2e": "playwright test -c e2e/playwright.config.ts",
+    "e2e:brave": "BRAVE_PATH='/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' playwright test -c e2e/playwright.config.ts",
+    "check": "npm run typecheck && npm run build && npm test && npm run e2e",
+    "zip": "node scripts/zip-extension.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/chrome": "^0.3.7",
+    "@types/node": "^26.6.6",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

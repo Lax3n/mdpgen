@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Règles</title></head>
+<body>
+  <form action="done.html" method="get">
+    <label>Nouveau mot de passe
+      <input type="password" id="password" name="new_password" maxlength="12"
+             passwordrules="required: upper; required: lower; required: digit; required: [-]; max-consecutive: 2">
+    </label>
+    <label>Répéter <input type="password" id="confirm" name="repeat_password" maxlength="12"></label>
+    <button type="submit">Enregistrer</button>
+  </form>
+</body>
+</html>

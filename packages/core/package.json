@@ -1,0 +1,13 @@
+{
+  "name": "@mdpgen/core",
+  "version": "0.1.0",
+  "description": "Cœur de MDP Gen : tirage uniforme sans biais, règles passwordrules, entropie exacte",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "src"],
+  "sideEffects": false,
+  "scripts": { "build": "tsc -p tsconfig.json" }
+}

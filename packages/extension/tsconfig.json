@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "outDir": ".tsout", "rootDir": "src", "lib": ["ES2022", "DOM", "DOM.Iterable"], "types": ["chrome"], "emitDeclarationOnly": true },
+  "include": ["src"],
+  "references": [{ "path": "../core" }]
+}

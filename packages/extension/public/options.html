@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MDP Gen</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body class="options">
+  <h1><span class="brand">MDP Gen</span> <span class="muted" data-i18n="optionsTitle"></span></h1>
+  <p class="muted" data-i18n="optionsIntro"></p>
+
+  <h2 data-i18n="optionsSectionPassword"></h2>
+  <div class="section">
+    <div class="option">
+      <label class="field">
+        <span data-i18n="popupLength"></span>
+        <span class="row"><input type="range" id="length" min="4" max="128" step="1"><input type="number" id="lengthNumber" min="4" max="128" step="1" class="w5"></span>
+      </label>
+    </div>
+    <div class="option">
+      <label><input type="checkbox" id="upper"><span data-i18n="optUpper"></span></label>
+      <label><input type="checkbox" id="lower"><span data-i18n="optLower"></span></label>
+      <label><input type="checkbox" id="digits"><span data-i18n="optDigits"></span></label>
+      <label><input type="checkbox" id="symbols"><span data-i18n="optSymbols"></span></label>
+      <label class="field mt6">
+        <span data-i18n="optSymbolSet"></span>
+        <input type="text" id="symbolSet" spellcheck="false" autocomplete="off">
+        <span class="help" data-i18n="optSymbolSetHelp"></span>
+      </label>
+    </div>
+    <div class="option">
+      <label><input type="checkbox" id="requireEach"><span data-i18n="optRequireEach"></span></label>
+      <span class="help" data-i18n="optRequireEachHelp"></span>
+    </div>
+    <div class="option">
+      <label><input type="checkbox" id="excludeAmbiguous"><span data-i18n="optExcludeAmbiguous"></span></label>
+      <span class="help" data-i18n="optExcludeAmbiguousHelp"></span>
+    </div>
+    <div class="option">
+      <label class="field">
+        <span data-i18n="optMaxConsecutive"></span>
+        <input type="number" id="maxConsecutive" min="0" max="16" step="1" class="w5">
+        <span class="help" data-i18n="optMaxConsecutiveHelp"></span>
+      </label>
+    </div>
+    <p class="meta" id="preview"></p>
+  </div>
+
+  <h2 data-i18n="optionsSectionBehaviour"></h2>
+  <div class="section">
+    <div class="option">
+      <label><input type="checkbox" id="autoSuggest"><span data-i18n="optAutoSuggest"></span></label>
+      <span class="help" data-i18n="optAutoSuggestHelp"></span>
+    </div>
+    <div class="option">
+      <label><input type="checkbox" id="showOnAllPasswordFields"><span data-i18n="optShowOnAll"></span></label>
+      <span class="help" data-i18n="optShowOnAllHelp"></span>
+    </div>
+    <div class="option">
+      <label><input type="checkbox" id="submitAfterFill"><span data-i18n="optSubmitAfterFill"></span></label>
+      <span class="help" data-i18n="optSubmitAfterFillHelp"></span>
+    </div>
+    <div class="option">
+      <label class="field">
+        <span data-i18n="optRetain"></span>
+        <input type="number" id="retainMinutes" min="0" max="1440" step="1" class="w5">
+        <span class="help" data-i18n="optRetainHelp"></span>
+      </label>
+    </div>
+  </div>
+
+  <h2 data-i18n="optionsSectionTouchId"></h2>
+  <div class="section">
+    <div class="option">
+      <label><input type="checkbox" id="touchId"><span data-i18n="optTouchId"></span></label>
+      <span class="help" data-i18n="optTouchIdHelp"></span>
+    </div>
+    <div class="option">
+      <p id="touchIdStatus" class="muted"></p>
+      <div class="row wrap">
+        <button type="button" class="btn" id="touchIdEnroll" data-i18n="optTouchIdEnroll"></button>
+        <button type="button" class="btn" id="touchIdTest" data-i18n="optTouchIdTest"></button>
+        <button type="button" class="btn danger" id="touchIdReset" data-i18n="optTouchIdReset"></button>
+      </div>
+      <p class="status" id="touchIdResult" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h2 data-i18n="optionsSectionAbout"></h2>
+  <div class="section">
+    <div class="option">
+      <p data-i18n="aboutPrivacy"></p>
+      <p data-i18n="aboutRandom"></p>
+      <div class="row wrap">
+        <button type="button" class="btn danger" id="reset" data-i18n="optionsReset"></button>
+        <a class="link" href="https://github.com/Lax3n/mdpgen" target="_blank" rel="noopener">GitHub</a>
+        <span class="muted" id="version"></span>
+      </div>
+    </div>
+  </div>
+  <p class="status" id="saved" aria-live="polite"></p>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

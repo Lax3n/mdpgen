@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.tsbuildinfo
+e2e/.playwright/
+e2e/test-results/
+e2e/playwright-report/
+.DS_Store
+*.zip
+.tsout/
