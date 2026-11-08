@@ -63,6 +63,55 @@
     </div>
   </section>
 
+  <h2 data-i18n="vaultTitle"></h2>
+  <section class="group" id="vaultNone" hidden>
+    <div class="row">
+      <span class="text"><span class="label" data-i18n="vaultIntro"></span><span class="help" data-i18n="vaultIntroHelp"></span></span>
+      <span class="control"><button type="button" class="btn primary" id="vaultCreate" data-i18n="vaultCreate"></button></span>
+    </div>
+    <div class="row" id="vaultCreateStatusRow" hidden><span class="text"><span class="help status" id="vaultCreateStatus" aria-live="polite"></span></span></div>
+  </section>
+  <section class="group" id="vaultRecovery" hidden>
+    <div class="row stack">
+      <span class="label strong" data-i18n="vaultRecoveryTitle"></span>
+      <span class="help" data-i18n="vaultRecoveryHelp"></span>
+      <code class="recovery-key selectable" id="vaultRecoveryKey"></code>
+      <div class="links"><button type="button" class="btn" id="vaultRecoveryCopy" data-i18n="popupCopy"></button></div>
+      <label class="ack"><input type="checkbox" class="switch" id="vaultRecoveryAck"><span data-i18n="vaultRecoveryAck"></span></label>
+      <div class="links"><button type="button" class="btn primary" id="vaultRecoveryDone" disabled data-i18n="vaultRecoveryDone"></button></div>
+    </div>
+  </section>
+  <section class="group" id="vaultExists" hidden>
+    <div class="row">
+      <span class="text"><span class="label" id="vaultStatus"></span><span class="help" id="vaultCreatedAt"></span></span>
+      <span class="control">
+        <button type="button" class="btn primary" id="vaultUnlockNow" data-i18n="vaultUnlock" hidden></button>
+        <button type="button" class="btn" id="vaultLockNow" data-i18n="vaultLock"></button>
+      </span>
+    </div>
+    <div class="row">
+      <span class="text"><span class="label" data-i18n="vaultLockMinutes"></span><span class="help" data-i18n="vaultLockMinutesHelp"></span></span>
+      <span class="control"><input type="number" id="vaultLockMinutes" class="num" min="1" max="1440" step="1"></span>
+    </div>
+    <div class="row stack" id="vaultRecoveryUnlockRow">
+      <span class="label" data-i18n="vaultRecoveryUnlock"></span>
+      <span class="help" data-i18n="vaultRecoveryUnlockHelp"></span>
+      <div class="links">
+        <input type="text" id="vaultRecoveryInput" class="wide" data-i18n-placeholder="vaultRecoveryPlaceholder" autocomplete="off" spellcheck="false">
+        <button type="button" class="btn" id="vaultRecoveryUnlockBtn" data-i18n="vaultUnlock"></button>
+      </div>
+      <span class="help status" id="vaultRecoveryStatus" aria-live="polite"></span>
+    </div>
+    <div class="row" id="vaultRelinkRow" hidden>
+      <span class="text"><span class="label" data-i18n="vaultRelink"></span><span class="help" data-i18n="vaultRelinkHelp"></span></span>
+      <span class="control"><button type="button" class="btn primary" id="vaultRelink" data-i18n="vaultRelink"></button></span>
+    </div>
+    <div class="row">
+      <span class="text"><span class="label" data-i18n="vaultDestroy"></span><span class="help" data-i18n="vaultDestroyHelp"></span></span>
+      <span class="control"><button type="button" class="btn danger" id="vaultDestroyBtn" data-i18n="vaultDestroy"></button></span>
+    </div>
+  </section>
+
   <h2 data-i18n="optionsSectionAbout"></h2>
   <section class="group">
     <div class="row"><span class="text"><span class="help" data-i18n="aboutPrivacy"></span></span></div>

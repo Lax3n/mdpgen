@@ -1,6 +1,6 @@
 # Étude : un coffre local protégé par Touch ID (WebAuthn PRF)
 
-*08 novembre 2026. État : étude, rien n'est codé.*
+*08 novembre 2026. État : phase 1 réalisée le jour même (coffre, clé de secours, enregistrement automatique, vue dans le popup). Phases 2 et 3 à venir.*
 
 ## Ce qu'on veut
 
@@ -43,16 +43,16 @@ sortie PRF (32 octets)
         ▼
 KEK (AES-256-GCM)  ──déchiffre──▶  VK, clé du coffre (AES-256-GCM, aléatoire)
                                         │
-phrase de secours (6 mots EFF)          │
-        │  PBKDF2-SHA-256, 600 000 itérations, sel dédié
+clé de secours (25 caractères, 125 bits) │
+        │  HKDF-SHA-256, sel dédié       │
         ▼                               │
 KEK de secours  ──déchiffre──▶  la même VK
 ```
 
 - La clé WebAuthn actuelle de MDP Gen n'a pas été créée avec PRF ; l'activation du coffre la recrée (une empreinte).
-- La clé du coffre `VK` est enveloppée deux fois : par la clé dérivée de Touch ID, et par une clé dérivée d'une **phrase de secours** générée une seule fois et montrée à l'utilisateur pour qu'il la note. Sans elle, un profil Brave réinitialisé, un nouveau Mac ou une clé WebAuthn supprimée rendent le coffre définitivement illisible. Elle est obligatoire.
+- La clé du coffre `VK` est enveloppée deux fois : par la clé dérivée de Touch ID, et par une clé dérivée d'une **clé de secours** de 25 caractères (alphabet de Crockford, 125 bits, tirée uniformément par le cœur de MDP Gen) générée une seule fois et montrée à l'utilisateur pour qu'il la note. Sans elle, un profil Brave réinitialisé, un nouveau Mac ou une clé WebAuthn supprimée rendent le coffre définitivement illisible. Elle est obligatoire. *Choix de réalisation : une clé aléatoire plutôt que six mots, ce qui évite d'embarquer une liste de mots et, l'entropie étant déjà de 125 bits, rend l'étirement de clé inutile ; HKDF suffit.*
 - `VK` déchiffrée ne vit qu'en mémoire (`chrome.storage.session`, jamais sur disque) et s'efface après un délai réglable, 15 minutes par défaut, et à la fermeture du navigateur.
-- Tout est dans WebCrypto : aucune dépendance. Argon2 serait préférable à PBKDF2 pour la phrase de secours, mais il n'existe pas dans WebCrypto ; une phrase de six mots EFF porte 77 bits d'entropie, ce qui rend PBKDF2 acceptable.
+- Tout est dans WebCrypto : aucune dépendance. Le module `vault.ts` ne touche au navigateur qu'à travers deux stockages injectés, ce qui permet de le tester sous Node (11 tests : création, enveloppes, clé de secours mal tapée, expiration, altération détectée, rien en clair sur disque).
 
 ### Données
 
@@ -83,7 +83,7 @@ Chiffrer la liste entière, et non chaque entrée, évite de laisser les noms d'
 
 - Permissions : inchangées, `storage` suffit. Toujours aucune requête réseau.
 - Nouveau module `vault` (clés, chiffrement, entrées), nouvelle vue dans le popup, détection de l'identifiant et des formulaires de connexion dans le script de contenu, migration de la clé WebAuthn vers PRF.
-- Les tests de bout en bout gardent l'authentificateur virtuel, qui sait faire PRF : l'ensemble du coffre se teste sans capteur.
+- Les tests de bout en bout gardent l'authentificateur virtuel, qui sait faire PRF (`hasPrf`). Limite mesurée : un authentificateur virtuel est propre à chaque page et `WebAuthn.addCredential` ne transporte pas le secret PRF ; une clé recopiée vers une autre page rend donc une autre sortie PRF. La chaîne « une seule empreinte remplit, valide et enregistre » n'est testable que sur le vrai capteur ; les tests couvrent la création, le verrou, la clé de secours, le relien de Touch ID, l'enregistrement en attente et le repli quand la clé diffère.
 - Brave continuera de proposer sa propre bulle d'enregistrement ; on conseillera de la désactiver dans ses réglages pour ne pas avoir deux gestionnaires.
 
 ### Sécurité
@@ -104,13 +104,13 @@ Non couvert, et il faut le dire :
 
 | Phase | Contenu | Durée |
 | --- | --- | --- |
-| 1 | Coffre, clé PRF, phrase de secours, enregistrement automatique à l'inscription, vue Coffre dans le popup | 2 jours |
+| 1 | Coffre, clé PRF, clé de secours, enregistrement automatique à l'inscription, vue Coffre dans le popup | **fait** |
 | 2 | Connexion automatique : formulaires de connexion, multi-comptes, clic sur le bouton, mise à jour au changement de mot de passe | 1,5 jour |
 | 3 | Export et import, verrouillage automatique, tests de bout en bout avec PRF virtuel, documentation | 1 jour |
 
 ## Décisions à prendre
 
-1. **Faire le coffre, oui ou non.** Cela revient sur la décision « réglages seulement » et fait de MDP Gen un gestionnaire de mots de passe local.
+1. ~~**Faire le coffre, oui ou non.**~~ Décidé le 8 novembre : oui, phase 1 réalisée.
 2. **Connexion automatique** : Touch ID et clic « Se connecter » dès l'arrivée sur la page de connexion, ou seulement sur un bouton de la bulle.
 3. **Bulle d'enregistrement de Brave** : la laisser en doublon ou recommander de la couper.
 4. **Phrase de secours obligatoire** à l'activation, recommandé.

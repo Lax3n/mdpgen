@@ -323,5 +323,143 @@
         "content": "$3"
       }
     }
+  },
+  "vaultTitle": {
+    "message": "Coffre"
+  },
+  "vaultIntro": {
+    "message": "Garder les mots de passe créés"
+  },
+  "vaultIntroHelp": {
+    "message": "Chiffré sur ce Mac, clé dérivée de Touch ID (WebAuthn PRF). Après une inscription validée par Touch ID, le mot de passe est enregistré sans un clic. Une clé de secours vous est remise à la création : sans elle, un profil Brave réinitialisé rend le coffre illisible."
+  },
+  "vaultCreate": {
+    "message": "Créer le coffre"
+  },
+  "vaultCreating": {
+    "message": "Touch ID… deux empreintes : la clé, puis la dérivation du secret."
+  },
+  "vaultPrfUnavailable": {
+    "message": "Cet authentificateur ne fournit pas l'extension PRF : le coffre n'est pas possible ici."
+  },
+  "vaultRecoveryTitle": {
+    "message": "Votre clé de secours"
+  },
+  "vaultRecoveryHelp": {
+    "message": "Notez-la et rangez-la hors de ce Mac. Elle ouvre le coffre sans Touch ID et ne sera plus jamais affichée."
+  },
+  "vaultRecoveryAck": {
+    "message": "Je l'ai notée en lieu sûr"
+  },
+  "vaultRecoveryDone": {
+    "message": "Terminer"
+  },
+  "vaultStatusLocked": {
+    "message": "Coffre verrouillé"
+  },
+  "vaultStatusUnlocked": {
+    "message": "Coffre déverrouillé · $1 mots de passe",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "vaultStatusUnlockedOne": {
+    "message": "Coffre déverrouillé · 1 mot de passe"
+  },
+  "vaultCreatedOn": {
+    "message": "Créé le $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "vaultLock": {
+    "message": "Verrouiller"
+  },
+  "vaultUnlock": {
+    "message": "Déverrouiller"
+  },
+  "vaultUnlocked": {
+    "message": "Coffre déverrouillé."
+  },
+  "vaultLockMinutes": {
+    "message": "Reverrouiller après (minutes)"
+  },
+  "vaultLockMinutesHelp": {
+    "message": "Après Touch ID, le coffre reste ouvert ce temps-là puis se referme. Il se ferme aussi avec le navigateur."
+  },
+  "vaultRecoveryUnlock": {
+    "message": "Ouvrir avec la clé de secours"
+  },
+  "vaultRecoveryUnlockHelp": {
+    "message": "Si Touch ID ne fonctionne plus (profil réinitialisé, autre Mac), tapez la clé notée à la création. Vous pourrez ensuite relier Touch ID."
+  },
+  "vaultRecoveryPlaceholder": {
+    "message": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
+  },
+  "vaultRecoveryWrong": {
+    "message": "Cette clé n'ouvre pas le coffre."
+  },
+  "vaultRelink": {
+    "message": "Relier Touch ID"
+  },
+  "vaultRelinkHelp": {
+    "message": "Le coffre est ouvert par la clé de secours mais lié à une autre clé Touch ID. Relier crée une nouvelle clé sur ce Mac."
+  },
+  "vaultRelinked": {
+    "message": "Touch ID relié au coffre."
+  },
+  "vaultDestroy": {
+    "message": "Supprimer le coffre"
+  },
+  "vaultDestroyHelp": {
+    "message": "Efface définitivement toutes les entrées de ce Mac."
+  },
+  "vaultDestroyConfirm": {
+    "message": "Supprimer le coffre et tous ses mots de passe ? Cette action est irréversible."
+  },
+  "vaultEmpty": {
+    "message": "Aucun mot de passe enregistré pour l'instant."
+  },
+  "vaultEntries": {
+    "message": "$1 mots de passe",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "vaultEntryOne": {
+    "message": "1 mot de passe"
+  },
+  "vaultSearch": {
+    "message": "Rechercher"
+  },
+  "vaultDelete": {
+    "message": "Supprimer"
+  },
+  "vaultDeleteConfirm": {
+    "message": "Confirmer"
+  },
+  "vaultNoUsername": {
+    "message": "(sans identifiant)"
+  },
+  "vaultSavePending": {
+    "message": "Enregistrer ce mot de passe dans le coffre ?"
+  },
+  "vaultSaveNow": {
+    "message": "Touch ID et enregistrer"
+  },
+  "vaultIgnore": {
+    "message": "Ignorer"
+  },
+  "vaultSaved": {
+    "message": "Enregistré dans le coffre."
+  },
+  "vaultNeedsOptions": {
+    "message": "Le coffre est lié à une autre clé Touch ID : ouvrez les options."
   }
 }

@@ -1,6 +1,6 @@
 import { suggest, type Suggestion } from '../shared/generator.js';
 import { localize, strengthLabel, t } from '../shared/i18n.js';
-import { ICON_EYE, ICON_EYE_OFF, ICON_FINGERPRINT, ICON_REFRESH, icon, mask } from '../shared/icons.js';
+import { ICON_COPY, ICON_EYE, ICON_EYE_OFF, ICON_FINGERPRINT, ICON_REFRESH, ICON_TRASH, icon, mask } from '../shared/icons.js';
 import {
   readLastPassword,
   sendToBackground,
@@ -9,7 +9,8 @@ import {
   type ProbeResponse,
 } from '../shared/messages.js';
 import { loadSettings, saveSettings, type Settings } from '../shared/settings.js';
-import { TouchIdError, ensureVerified, touchIdStatus } from '../shared/webauthn.js';
+import { PENDING_SAVE_KEY, Vault, fromBase64Url, hostOf, type PendingSave, type VaultEntry } from '../shared/vault.js';
+import { TouchIdError, ensureVerified, readStoredCredential, touchIdStatus, verify } from '../shared/webauthn.js';
 
 declare const __MDPGEN_VERSION__: string;
 
@@ -43,10 +44,24 @@ const els = {
   lastCopy: $<HTMLButtonElement>('lastCopy'),
   lastForget: $<HTMLButtonElement>('lastForget'),
   version: $<HTMLElement>('version'),
+  pendingSave: $<HTMLElement>('pendingSave'),
+  pendingSaveWho: $<HTMLElement>('pendingSaveWho'),
+  pendingSaveNow: $<HTMLButtonElement>('pendingSaveNow'),
+  pendingSaveIgnore: $<HTMLButtonElement>('pendingSaveIgnore'),
+  vaultCard: $<HTMLElement>('vaultCard'),
+  vaultSummary: $<HTMLElement>('vaultSummary'),
+  vaultToggle: $<HTMLButtonElement>('vaultToggle'),
+  vaultEntriesRow: $<HTMLElement>('vaultEntriesRow'),
+  vaultSearch: $<HTMLInputElement>('vaultSearch'),
+  vaultEntries: $<HTMLUListElement>('vaultEntries'),
 };
 
 let settings: Settings;
+const vault = Vault.forChrome(async () => settings.vaultLockMinutes);
 let suggestion: Suggestion;
+let vaultEntries: VaultEntry[] = [];
+let revealedEntry: string | null = null;
+let confirmDelete: string | null = null;
 let probe: ProbeResponse | null = null;
 let tabId: number | null = null;
 let revealed = false;
@@ -230,6 +245,183 @@ async function unlockLast(): Promise<boolean> {
   }
 }
 
+// ---------- Coffre ----------
+
+function touchIdErrorText(error: unknown): string {
+  if (error instanceof TouchIdError) {
+    return error.reason === 'cancelled' ? t('confirmCancelled') : t('confirmFailed', error.message);
+  }
+  return error instanceof Error ? error.message : String(error);
+}
+
+/** Déverrouille le coffre par Touch ID (assertion PRF). Vrai si le coffre est ouvert ensuite. */
+async function unlockVault(): Promise<boolean> {
+  if (await vault.isUnlocked()) return true;
+  const blob = await vault.read();
+  const stored = await readStoredCredential();
+  if (!blob) return false;
+  if (!stored || stored.id !== blob.credentialId) {
+    setStatus(t('vaultNeedsOptions'), 'bad');
+    return false;
+  }
+  try {
+    const { prf } = await verify(fromBase64Url(blob.prfSalt));
+    if (!prf) throw new Error(t('vaultPrfUnavailable'));
+    await vault.unlockWithPrf(prf);
+    return true;
+  } catch (error) {
+    setStatus(touchIdErrorText(error), 'bad');
+    return false;
+  }
+}
+
+function entryItem(entry: VaultEntry): HTMLLIElement {
+  const li = document.createElement('li');
+  li.className = 'entry';
+  li.dataset.id = entry.id;
+  const text = document.createElement('div');
+  text.className = 'text';
+  const host = document.createElement('span');
+  host.className = 'label strong';
+  host.textContent = entry.host;
+  const user = document.createElement('span');
+  user.className = 'help';
+  user.textContent = entry.username || t('vaultNoUsername');
+  text.append(host, user);
+  if (revealedEntry === entry.id) {
+    const pw = document.createElement('code');
+    pw.className = 'pw selectable';
+    pw.textContent = entry.password;
+    text.append(pw);
+  }
+  const actions = document.createElement('div');
+  actions.className = 'control';
+  const reveal = document.createElement('button');
+  reveal.type = 'button';
+  reveal.className = 'icon';
+  reveal.dataset.action = 'reveal';
+  reveal.title = t(revealedEntry === entry.id ? 'bubbleHide' : 'bubbleReveal');
+  reveal.append(icon(revealedEntry === entry.id ? ICON_EYE_OFF : ICON_EYE));
+  const copy = document.createElement('button');
+  copy.type = 'button';
+  copy.className = 'icon';
+  copy.dataset.action = 'copy';
+  copy.title = t('popupCopy');
+  copy.append(icon(ICON_COPY));
+  const del = document.createElement('button');
+  del.type = 'button';
+  del.className = confirmDelete === entry.id ? 'btn danger small-btn' : 'icon';
+  del.dataset.action = 'delete';
+  del.title = t('vaultDelete');
+  if (confirmDelete === entry.id) del.textContent = t('vaultDeleteConfirm');
+  else del.append(icon(ICON_TRASH));
+  actions.append(reveal, copy, del);
+  li.append(text, actions);
+  return li;
+}
+
+function renderEntries(): void {
+  const query = els.vaultSearch.value.trim().toLowerCase();
+  const shown = vaultEntries.filter((e) => !query || e.host.toLowerCase().includes(query) || e.username.toLowerCase().includes(query));
+  els.vaultEntries.replaceChildren(...shown.map(entryItem));
+}
+
+async function renderVault(): Promise<void> {
+  const blob = await vault.read();
+  els.vaultCard.hidden = blob === null;
+  if (!blob) return;
+  const unlocked = await vault.isUnlocked();
+  els.vaultToggle.textContent = t(unlocked ? 'vaultLock' : 'vaultUnlock');
+  if (!unlocked) {
+    els.vaultSummary.textContent = t('vaultStatusLocked');
+    els.vaultEntriesRow.hidden = true;
+    vaultEntries = [];
+    return;
+  }
+  vaultEntries = (await vault.entries()).sort((a, b) => a.host.localeCompare(b.host) || a.username.localeCompare(b.username));
+  const count = vaultEntries.length;
+  els.vaultSummary.textContent = count === 0 ? t('vaultEmpty') : count === 1 ? t('vaultEntryOne') : t('vaultEntries', String(count));
+  els.vaultEntriesRow.hidden = count === 0;
+  els.vaultSearch.hidden = count < 6;
+  renderEntries();
+}
+
+async function onEntryAction(event: Event): Promise<void> {
+  const button = (event.target as HTMLElement | null)?.closest<HTMLButtonElement>('button[data-action]');
+  const item = button?.closest<HTMLLIElement>('li.entry');
+  if (!button || !item?.dataset.id) return;
+  const id = item.dataset.id;
+  const entry = vaultEntries.find((e) => e.id === id);
+  if (!entry) return;
+  switch (button.dataset.action) {
+    case 'reveal':
+      revealedEntry = revealedEntry === id ? null : id;
+      renderEntries();
+      break;
+    case 'copy':
+      await copyText(entry.password);
+      await vault.markUsed(id);
+      break;
+    case 'delete':
+      if (confirmDelete !== id) {
+        confirmDelete = id;
+        renderEntries();
+        setTimeout(() => {
+          if (confirmDelete === id) {
+            confirmDelete = null;
+            renderEntries();
+          }
+        }, 4000);
+        break;
+      }
+      confirmDelete = null;
+      await vault.remove(id);
+      await renderVault();
+      break;
+    default:
+      break;
+  }
+}
+
+async function readPendingSave(): Promise<PendingSave | null> {
+  const stored = await chrome.storage.session.get(PENDING_SAVE_KEY);
+  const pending = stored[PENDING_SAVE_KEY] as PendingSave | undefined;
+  return pending && typeof pending.password === 'string' ? pending : null;
+}
+
+async function renderPendingSave(): Promise<void> {
+  const pending = (await vault.exists()) ? await readPendingSave() : null;
+  els.pendingSave.hidden = pending === null;
+  if (!pending) return;
+  els.pendingSaveWho.textContent = `${pending.username || t('vaultNoUsername')} · ${hostOf(pending.origin)}`;
+}
+
+async function clearPendingSave(): Promise<void> {
+  await sendToBackground({ type: 'mdpgen:pending-save-clear' });
+  await renderPendingSave();
+}
+
+function bindVault(): void {
+  els.vaultToggle.addEventListener('click', async () => {
+    if (await vault.isUnlocked()) await vault.lock();
+    else await unlockVault();
+    revealedEntry = null;
+    await renderVault();
+  });
+  els.vaultSearch.addEventListener('input', renderEntries);
+  els.vaultEntries.addEventListener('click', (event) => void onEntryAction(event));
+  els.pendingSaveNow.addEventListener('click', async () => {
+    const pending = await readPendingSave();
+    if (!pending) return;
+    if (!(await unlockVault())) return;
+    await vault.save(pending);
+    await clearPendingSave();
+    setStatus(t('vaultSaved'), 'ok');
+    await renderVault();
+  });
+  els.pendingSaveIgnore.addEventListener('click', () => void clearPendingSave());
+}
+
 async function init(): Promise<void> {
   localize(document);
   els.version.textContent = `v${__MDPGEN_VERSION__}`;
@@ -239,6 +431,9 @@ async function init(): Promise<void> {
   await probeTab();
   regenerate();
   await renderLast();
+  bindVault();
+  await renderPendingSave();
+  await renderVault();
 
   els.regenerate.addEventListener('click', regenerate);
   els.reveal.addEventListener('click', () => {

@@ -1,7 +1,32 @@
 /** Fenêtre de confirmation : demande Touch ID puis laisse le service worker remplir et valider. */
 import { localize, t } from '../shared/i18n.js';
 import { sendToBackground, type ConfirmInfoResponse } from '../shared/messages.js';
-import { TouchIdError, ensureVerified, readStoredCredential } from '../shared/webauthn.js';
+import { loadSettings } from '../shared/settings.js';
+import { Vault, fromBase64Url } from '../shared/vault.js';
+import { TouchIdError, ensureVerified, readStoredCredential, verify } from '../shared/webauthn.js';
+
+const vault = Vault.forChrome(async () => (await loadSettings()).vaultLockMinutes);
+
+/**
+ * Touch ID, et si le coffre existe avec cette clé, la même assertion évalue la
+ * PRF et déverrouille le coffre : une seule empreinte pour remplir, valider et enregistrer.
+ */
+async function verifyAndUnlock(): Promise<void> {
+  const blob = await vault.read();
+  const stored = await readStoredCredential();
+  if (blob && stored && stored.id === blob.credentialId) {
+    const { prf } = await verify(fromBase64Url(blob.prfSalt));
+    if (prf) {
+      try {
+        await vault.unlockWithPrf(prf);
+      } catch {
+        // Coffre d'une autre clé : on remplit quand même, l'enregistrement restera en attente.
+      }
+    }
+    return;
+  }
+  await ensureVerified();
+}
 
 function $<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -60,7 +85,7 @@ async function run(): Promise<void> {
   const enrolled = (await readStoredCredential()) !== null;
   setStatus(t(enrolled ? 'confirmTouch' : 'confirmEnroll'), 'busy');
   try {
-    await ensureVerified();
+    await verifyAndUnlock();
     await finish();
   } catch (error) {
     const reason = error instanceof TouchIdError ? error.reason : 'failed';

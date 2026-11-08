@@ -323,5 +323,143 @@
         "content": "$3"
       }
     }
+  },
+  "vaultTitle": {
+    "message": "Vault"
+  },
+  "vaultIntro": {
+    "message": "Keep the passwords you create"
+  },
+  "vaultIntroHelp": {
+    "message": "Encrypted on this Mac, key derived from Touch ID (WebAuthn PRF). After a sign-up confirmed with Touch ID, the password is saved without a click. A recovery key is given to you at creation: without it, a reset Brave profile makes the vault unreadable."
+  },
+  "vaultCreate": {
+    "message": "Create the vault"
+  },
+  "vaultCreating": {
+    "message": "Touch ID… two touches: the key, then the secret derivation."
+  },
+  "vaultPrfUnavailable": {
+    "message": "This authenticator does not provide the PRF extension: the vault is not possible here."
+  },
+  "vaultRecoveryTitle": {
+    "message": "Your recovery key"
+  },
+  "vaultRecoveryHelp": {
+    "message": "Write it down and keep it away from this Mac. It opens the vault without Touch ID and will never be shown again."
+  },
+  "vaultRecoveryAck": {
+    "message": "I have written it down somewhere safe"
+  },
+  "vaultRecoveryDone": {
+    "message": "Done"
+  },
+  "vaultStatusLocked": {
+    "message": "Vault locked"
+  },
+  "vaultStatusUnlocked": {
+    "message": "Vault unlocked · $1 passwords",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "vaultStatusUnlockedOne": {
+    "message": "Vault unlocked · 1 password"
+  },
+  "vaultCreatedOn": {
+    "message": "Created on $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "vaultLock": {
+    "message": "Lock"
+  },
+  "vaultUnlock": {
+    "message": "Unlock"
+  },
+  "vaultUnlocked": {
+    "message": "Vault unlocked."
+  },
+  "vaultLockMinutes": {
+    "message": "Lock again after (minutes)"
+  },
+  "vaultLockMinutesHelp": {
+    "message": "After Touch ID the vault stays open for that long, then locks. It also locks when the browser closes."
+  },
+  "vaultRecoveryUnlock": {
+    "message": "Open with the recovery key"
+  },
+  "vaultRecoveryUnlockHelp": {
+    "message": "If Touch ID no longer works (reset profile, another Mac), type the key you wrote down at creation. You can then link Touch ID again."
+  },
+  "vaultRecoveryPlaceholder": {
+    "message": "XXXXX-XXXXX-XXXXX-XXXXX-XXXXX"
+  },
+  "vaultRecoveryWrong": {
+    "message": "This key does not open the vault."
+  },
+  "vaultRelink": {
+    "message": "Link Touch ID again"
+  },
+  "vaultRelinkHelp": {
+    "message": "The vault is open with the recovery key but linked to another Touch ID key. Linking creates a new key on this Mac."
+  },
+  "vaultRelinked": {
+    "message": "Touch ID linked to the vault."
+  },
+  "vaultDestroy": {
+    "message": "Delete the vault"
+  },
+  "vaultDestroyHelp": {
+    "message": "Permanently erases every entry from this Mac."
+  },
+  "vaultDestroyConfirm": {
+    "message": "Delete the vault and all its passwords? This cannot be undone."
+  },
+  "vaultEmpty": {
+    "message": "No password saved yet."
+  },
+  "vaultEntries": {
+    "message": "$1 passwords",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "vaultEntryOne": {
+    "message": "1 password"
+  },
+  "vaultSearch": {
+    "message": "Search"
+  },
+  "vaultDelete": {
+    "message": "Delete"
+  },
+  "vaultDeleteConfirm": {
+    "message": "Confirm"
+  },
+  "vaultNoUsername": {
+    "message": "(no username)"
+  },
+  "vaultSavePending": {
+    "message": "Save this password in the vault?"
+  },
+  "vaultSaveNow": {
+    "message": "Touch ID and save"
+  },
+  "vaultIgnore": {
+    "message": "Ignore"
+  },
+  "vaultSaved": {
+    "message": "Saved in the vault."
+  },
+  "vaultNeedsOptions": {
+    "message": "The vault is linked to another Touch ID key: open the options."
   }
 }

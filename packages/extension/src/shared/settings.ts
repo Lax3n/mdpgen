@@ -14,6 +14,8 @@ export interface Settings extends Preferences {
   submitAfterFill: boolean;
   /** Durée pendant laquelle le dernier mot de passe proposé reste en mémoire de session (minutes, 0 = jamais). */
   retainMinutes: number;
+  /** Durée pendant laquelle le coffre reste déverrouillé après Touch ID (minutes). */
+  vaultLockMinutes: number;
 }
 
 export const DEFAULT_SETTINGS: Readonly<Settings> = Object.freeze({
@@ -24,6 +26,7 @@ export const DEFAULT_SETTINGS: Readonly<Settings> = Object.freeze({
   autoTouchId: true,
   submitAfterFill: true,
   retainMinutes: 10,
+  vaultLockMinutes: 15,
 });
 
 const STORAGE_KEY = 'settings';
@@ -33,6 +36,7 @@ export function sanitizeSettings(raw: unknown): Settings {
   const prefs = sanitizePreferences(input);
   const bool = (value: unknown, fallback: boolean): boolean => (typeof value === 'boolean' ? value : fallback);
   const retain = Number(input.retainMinutes);
+  const lock = Number(input.vaultLockMinutes);
   return {
     ...prefs,
     autoSuggest: bool(input.autoSuggest, DEFAULT_SETTINGS.autoSuggest),
@@ -42,6 +46,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     submitAfterFill: bool(input.submitAfterFill, DEFAULT_SETTINGS.submitAfterFill),
     retainMinutes:
       Number.isInteger(retain) && retain >= 0 && retain <= 1440 ? retain : DEFAULT_SETTINGS.retainMinutes,
+    vaultLockMinutes: Number.isInteger(lock) && lock >= 1 && lock <= 1440 ? lock : DEFAULT_SETTINGS.vaultLockMinutes,
   };
 }
 

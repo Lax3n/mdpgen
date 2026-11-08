@@ -21,8 +21,17 @@ export interface StoredCredential {
   alg: number;
   /** Hachage du RP ID tel que l'authentificateur l'a signé à la création, base64url. */
   rpIdHash: string;
+  /** L'authentificateur a accepté l'extension PRF à la création : la clé peut dériver un secret pour le coffre. */
+  prf: boolean;
   createdAt: number;
 }
+
+export interface VerifyResult {
+  /** Sortie PRF (32 octets) si un sel a été fourni et que l'authentificateur la prend en charge. */
+  prf: ArrayBuffer | null;
+}
+
+type PrfInputs = { prf: { eval: { first: Uint8Array<ArrayBuffer> } } | Record<string, never> };
 
 export type TouchIdStatus = 'unsupported' | 'unavailable' | 'not-enrolled' | 'enrolled';
 
@@ -103,9 +112,8 @@ export function isWebAuthnSupported(): boolean {
 export async function readStoredCredential(): Promise<StoredCredential | null> {
   const stored = await chrome.storage.local.get(STORAGE_KEY);
   const cred = stored[STORAGE_KEY] as StoredCredential | undefined;
-  return cred && typeof cred.id === 'string' && typeof cred.publicKey === 'string' && typeof cred.rpIdHash === 'string'
-    ? cred
-    : null;
+  if (!cred || typeof cred.id !== 'string' || typeof cred.publicKey !== 'string' || typeof cred.rpIdHash !== 'string') return null;
+  return { ...cred, prf: cred.prf === true };
 }
 
 export async function touchIdStatus(): Promise<TouchIdStatus> {
@@ -151,6 +159,7 @@ export async function enroll(): Promise<StoredCredential> {
           residentKey: 'discouraged',
         },
         attestation: 'none',
+        extensions: { prf: {} } as PrfInputs as AuthenticationExtensionsClientInputs,
         timeout: TIMEOUT_MS,
       },
     })) as PublicKeyCredential | null;
@@ -158,6 +167,7 @@ export async function enroll(): Promise<StoredCredential> {
     throw translateError(error);
   }
   if (!credential) throw new TouchIdError('Aucune clé créée.', 'failed');
+  const extensions = credential.getClientExtensionResults() as { prf?: { enabled?: boolean } };
   const response = credential.response as AuthenticatorAttestationResponse;
   const publicKey = response.getPublicKey?.();
   const alg = response.getPublicKeyAlgorithm?.();
@@ -169,28 +179,32 @@ export async function enroll(): Promise<StoredCredential> {
     publicKey: toBase64Url(publicKey),
     alg,
     rpIdHash: toBase64Url(authData.slice(0, 32)),
+    prf: extensions.prf?.enabled === true,
     createdAt: Date.now(),
   };
   await chrome.storage.local.set({ [STORAGE_KEY]: stored });
   return stored;
 }
 
-/** Demande Touch ID et vérifie l'assertion. Lève TouchIdError en cas d'échec. */
-export async function verify(): Promise<void> {
+/**
+ * Demande Touch ID et vérifie l'assertion. Lève TouchIdError en cas d'échec.
+ * Avec `prfSalt`, demande aussi l'évaluation PRF : la sortie sert de secret au coffre.
+ */
+export async function verify(prfSalt?: Uint8Array<ArrayBuffer>): Promise<VerifyResult> {
   const stored = await readStoredCredential();
   if (!stored) throw new TouchIdError('Touch ID non activé.', 'failed');
   const challenge = randomBytes(32);
+  const publicKey: PublicKeyCredentialRequestOptions = {
+    rpId: rpId(),
+    challenge,
+    allowCredentials: [{ type: 'public-key', id: fromBase64Url(stored.id), transports: ['internal'] }],
+    userVerification: 'required',
+    timeout: TIMEOUT_MS,
+  };
+  if (prfSalt) publicKey.extensions = { prf: { eval: { first: prfSalt } } } as PrfInputs as AuthenticationExtensionsClientInputs;
   let assertion: PublicKeyCredential | null;
   try {
-    assertion = (await navigator.credentials.get({
-      publicKey: {
-        rpId: rpId(),
-        challenge,
-        allowCredentials: [{ type: 'public-key', id: fromBase64Url(stored.id), transports: ['internal'] }],
-        userVerification: 'required',
-        timeout: TIMEOUT_MS,
-      },
-    })) as PublicKeyCredential | null;
+    assertion = (await navigator.credentials.get({ publicKey })) as PublicKeyCredential | null;
   } catch (error) {
     throw translateError(error);
   }
@@ -235,17 +249,24 @@ export async function verify(): Promise<void> {
     valid = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, derToRaw(signature), signed);
   }
   if (!valid) throw new TouchIdError('Signature invalide.', 'invalid');
+
+  const extensions = assertion.getClientExtensionResults() as { prf?: { results?: { first?: ArrayBuffer } } };
+  return { prf: extensions.prf?.results?.first ?? null };
 }
 
-/** Vérifie l'utilisateur : crée la clé si besoin (ce qui vérifie déjà), sinon demande une assertion. */
-export async function ensureVerified(): Promise<'enrolled' | 'verified'> {
+/**
+ * Vérifie l'utilisateur : crée la clé si besoin (ce qui vérifie déjà), sinon
+ * demande une assertion. Avec `prfSalt`, une assertion suit toujours, pour
+ * obtenir la sortie PRF (la création ne l'évalue pas).
+ */
+export async function ensureVerified(prfSalt?: Uint8Array<ArrayBuffer>): Promise<{ enrolled: boolean } & VerifyResult> {
   const stored = await readStoredCredential();
   if (!stored) {
     await enroll();
-    return 'enrolled';
+    if (!prfSalt) return { enrolled: true, prf: null };
+    return { enrolled: true, ...(await verify(prfSalt)) };
   }
-  await verify();
-  return 'verified';
+  return { enrolled: false, ...(await verify(prfSalt)) };
 }
 
 export async function resetEnrollment(): Promise<void> {

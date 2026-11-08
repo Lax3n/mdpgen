@@ -7,7 +7,7 @@ import { suggest, type Suggestion } from '../shared/generator.js';
 import { sendToBackground, type FillResponse, type Message, type ProbeResponse } from '../shared/messages.js';
 import { loadSettings, onSettingsChanged, type Settings } from '../shared/settings.js';
 import { Bubble, type BubbleState } from './bubble.js';
-import { allPasswordFields, classifyPasswordField, isUsablePasswordField, isVisible } from './detect.js';
+import { allPasswordFields, classifyPasswordField, findUsername, isUsablePasswordField, isVisible } from './detect.js';
 import { companionFields, setFieldValue, submitForm } from './fill.js';
 
 interface Active {
@@ -216,11 +216,20 @@ function onKeyDown(event: KeyboardEvent): void {
   if (event.key === 'Escape' && bubble.visible) bubble.hide();
 }
 
-function onSubmit(): void {
-  if (active && active.filled.length > 0) {
-    active.accepted = true;
-    bubble.hide();
-  }
+/** Le formulaire part avec notre mot de passe : on le signale pour le coffre (enregistré si déverrouillé, sinon mis en attente). */
+function onSubmit(event: Event): void {
+  if (!active || active.filled.length === 0) return;
+  const form = event.target;
+  if (form instanceof HTMLFormElement && active.field.form !== form) return;
+  active.accepted = true;
+  bubble.hide();
+  if (active.field.value !== active.suggestion.password) return;
+  void sendToBackground({
+    type: 'mdpgen:form-submitted',
+    origin: location.origin,
+    username: findUsername(active.field),
+    password: active.suggestion.password,
+  }).catch(() => undefined);
 }
 
 /** Le champ visé par une demande externe : la proposition en cours, sinon le dernier focalisé, sinon le premier champ de création. */
@@ -241,7 +250,14 @@ function fillFrom(field: HTMLInputElement, password: string, submit: boolean): F
     active = null;
   }
   bubble.hide();
-  return { filled: true, submitted: submit && finishSubmit(field), fields: targets.length, host: location.host };
+  return {
+    filled: true,
+    submitted: submit && finishSubmit(field),
+    fields: targets.length,
+    host: location.host,
+    origin: location.origin,
+    username: findUsername(field),
+  };
 }
 
 function onMessage(message: Message, _sender: chrome.runtime.MessageSender, sendResponse: (response: unknown) => void): boolean {
@@ -280,7 +296,14 @@ function onMessage(message: Message, _sender: chrome.runtime.MessageSender, send
     }
     bubble.hide();
     setTimeout(() => {
-      sendResponse({ filled: true, submitted: finishSubmit(field), fields: targets.length, host: location.host } satisfies FillResponse);
+      sendResponse({
+        filled: true,
+        submitted: finishSubmit(field),
+        fields: targets.length,
+        host: location.host,
+        origin: location.origin,
+        username: findUsername(field),
+      } satisfies FillResponse);
     }, 60);
     return true;
   }

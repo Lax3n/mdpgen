@@ -87,6 +87,7 @@ export async function addVirtualAuthenticator(page: Page, verified = true): Prom
       hasResidentKey: true,
       hasUserVerification: true,
       isUserVerified: verified,
+      hasPrf: true,
       automaticPresenceSimulation: true,
     },
   });

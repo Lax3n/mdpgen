@@ -38,6 +38,28 @@
     <label class="row"><span class="text"><span class="label" data-i18n="optSymbols"></span></span><input type="checkbox" class="switch" id="symbols"></label>
   </section>
 
+  <section class="group mt12" id="pendingSave" hidden>
+    <div class="row stack">
+      <span class="label strong" data-i18n="vaultSavePending"></span>
+      <span class="help" id="pendingSaveWho"></span>
+      <div class="links">
+        <button type="button" class="btn primary" id="pendingSaveNow" data-i18n="vaultSaveNow"></button>
+        <button type="button" class="btn" id="pendingSaveIgnore" data-i18n="vaultIgnore"></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="group mt12" id="vaultCard" hidden>
+    <div class="row">
+      <span class="text"><span class="label strong" data-i18n="vaultTitle"></span><span class="help" id="vaultSummary"></span></span>
+      <span class="control"><button type="button" class="btn" id="vaultToggle"></button></span>
+    </div>
+    <div class="row stack" id="vaultEntriesRow" hidden>
+      <input type="text" id="vaultSearch" class="wide search" data-i18n-placeholder="vaultSearch" autocomplete="off" spellcheck="false" hidden>
+      <ul class="entries" id="vaultEntries"></ul>
+    </div>
+  </section>
+
   <section class="group mt12" id="last" hidden>
     <div class="row stack">
       <div class="text split">

@@ -12,6 +12,9 @@ export interface FillResponse {
   submitted: boolean;
   fields: number;
   host: string;
+  origin: string;
+  /** Identifiant trouvé dans le formulaire (email ou nom d'utilisateur), vide sinon. */
+  username: string;
 }
 
 export interface ProbeRequest {
@@ -68,6 +71,17 @@ export interface ForgetRequest {
 export interface OpenOptionsRequest {
   type: 'mdpgen:open-options';
 }
+/** Script de contenu → service worker : un formulaire portant notre mot de passe vient d'être envoyé. */
+export interface FormSubmitted {
+  type: 'mdpgen:form-submitted';
+  origin: string;
+  username: string;
+  password: string;
+}
+/** Pages de l'extension → service worker : l'enregistrement en attente a été traité ou ignoré. */
+export interface PendingSaveClear {
+  type: 'mdpgen:pending-save-clear';
+}
 
 export type Message =
   | FillRequest
@@ -79,7 +93,9 @@ export type Message =
   | ConfirmCancelled
   | RememberRequest
   | ForgetRequest
-  | OpenOptionsRequest;
+  | OpenOptionsRequest
+  | FormSubmitted
+  | PendingSaveClear;
 
 export interface ErrorResponse {
   error: string;

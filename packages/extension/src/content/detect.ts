@@ -111,3 +111,37 @@ export function classifyPasswordField(field: HTMLInputElement): FieldKind {
   if (LOGIN_URL.test(where)) return 'login';
   return 'unknown';
 }
+
+const USERNAME_TEXT = /user|login|log-in|mail|identifiant|pseudo|account|compte|phone|tel|handle|nick/i;
+
+/**
+ * L'identifiant saisi dans le même formulaire : le champ email, sinon le champ
+ * marqué username, sinon le champ texte le plus vraisemblable avant le mot de passe.
+ */
+export function findUsername(field: HTMLInputElement): string {
+  const scope = fieldScope(field);
+  const candidates = Array.from(scope.querySelectorAll<HTMLInputElement>('input')).filter(
+    (input) =>
+      input !== field &&
+      ['text', 'email', 'tel', ''].includes(input.type) &&
+      !input.disabled &&
+      isVisible(input) &&
+      input.value.trim().length > 0,
+  );
+  let best: HTMLInputElement | null = null;
+  let bestScore = 0;
+  for (const input of candidates) {
+    const autocomplete = (input.autocomplete || input.getAttribute('autocomplete') || '').toLowerCase();
+    let score = 1;
+    if (input.type === 'email') score += 3;
+    if (/\b(username|email)\b/.test(autocomplete)) score += 4;
+    if (USERNAME_TEXT.test(`${attributeText(input)} ${labelText(input)}`)) score += 2;
+    if (input.value.includes('@')) score += 1;
+    if ((input.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0) score += 1;
+    if (score > bestScore) {
+      bestScore = score;
+      best = input;
+    }
+  }
+  return best?.value.trim() ?? '';
+}

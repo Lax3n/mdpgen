@@ -5,6 +5,9 @@
  */
 import { LAST_KEY, type FillResponse, type LastPassword, type Message } from '../shared/messages.js';
 import { loadSettings } from '../shared/settings.js';
+import { PENDING_SAVE_KEY, Vault, type PendingSave } from '../shared/vault.js';
+
+const vault = Vault.forChrome(async () => (await loadSettings()).vaultLockMinutes);
 
 interface Pending {
   tabId: number;
@@ -63,6 +66,12 @@ async function handle(message: Message, sender: chrome.runtime.MessageSender): P
       return chrome.storage.session.remove(LAST_KEY);
     case 'mdpgen:open-options':
       return chrome.runtime.openOptionsPage();
+    case 'mdpgen:form-submitted':
+      if (!sender.tab) throw new Error('Expéditeur inattendu.');
+      return recordPassword(message.origin, message.username, message.password);
+    case 'mdpgen:pending-save-clear':
+      if (!isExtensionPage(sender)) throw new Error('Expéditeur inattendu.');
+      return clearPendingSave();
     default:
       return undefined;
   }
@@ -172,7 +181,31 @@ async function completeConfirmation(requestId: string): Promise<FillResponse> {
   }
   if (!response?.filled) throw new Error('Le champ de mot de passe n’a pas pu être rempli.');
   await remember(pending.password, pending.host);
+  // Formulaire envoyé : le mot de passe rejoint le coffre. Sinon, l'envoi ultérieur du formulaire le signalera.
+  if (response.submitted) await recordPassword(response.origin, response.username, pending.password);
   return response;
+}
+
+/**
+ * Enregistre un mot de passe dans le coffre s'il existe et qu'il est déverrouillé ;
+ * sinon le garde en attente (mémoire de session) et le signale par une pastille.
+ */
+async function recordPassword(origin: string, username: string, password: string): Promise<void> {
+  if (!(await vault.exists())) return;
+  if (await vault.isUnlocked()) {
+    await vault.save({ origin, username, password });
+    await clearPendingSave();
+    return;
+  }
+  const pending: PendingSave = { origin, username, password, at: Date.now() };
+  await chrome.storage.session.set({ [PENDING_SAVE_KEY]: pending });
+  await chrome.action.setBadgeBackgroundColor({ color: '#0a7aff' });
+  await chrome.action.setBadgeText({ text: '1' });
+}
+
+async function clearPendingSave(): Promise<void> {
+  await chrome.storage.session.remove(PENDING_SAVE_KEY);
+  await chrome.action.setBadgeText({ text: '' });
 }
 
 async function cancelConfirmation(requestId: string): Promise<void> {

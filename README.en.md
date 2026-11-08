@@ -5,7 +5,7 @@ A truly random password generator in two shapes that share one core:
 - **a Brave / Chrome extension** that, like Safari, suggests a strong password as soon as a site asks for a new one, fills it, and can submit the form with **Touch ID** without ever showing it to you;
 - **a command-line tool**, `mdpgen`, with zero dependencies.
 
-Nothing is written to disk, nothing goes over the network, no telemetry. The code is short, readable and tested. *[Version française](README.md).*
+Nothing goes over the network, no telemetry. The optional vault encrypts passwords with a key that only exists after Touch ID. The code is short, readable and tested. *[Version française](README.md).*
 
 ## What the extension does
 
@@ -17,6 +17,14 @@ Nothing is written to disk, nothing goes over the network, no telemetry. The cod
 Type anything in the field and the suggestion goes away. Nothing shows on sign-in forms (configurable).
 
 The toolbar popup generates on demand, copies, inserts into the page, and shows the **last suggested password** for ten minutes, behind Touch ID: a safety net if Brave did not offer to save. That memory lives in `chrome.storage.session`, is never written to disk, is cleared when the browser closes, and can be turned off.
+
+### The vault
+
+Enable it in the options: two touches (the Touch ID key is recreated with the WebAuthn PRF extension, then the secret is derived) and a 25-character **recovery key** is shown once. Write it down: it is the only way to open the vault if Touch ID goes away, after a Brave profile reset or on a new Mac.
+
+From then on, a sign-up confirmed with Touch ID fills, submits **and saves** the password together with the form's username: one touch, zero clicks. If the vault was locked when a password was used, a badge appears on the icon and the popup offers to save it after Touch ID. The popup lists entries, copies, reveals or deletes them, and locks. The vault locks itself after 15 minutes and when the browser closes.
+
+Under the hood: the PRF output of the Touch ID assertion goes through HKDF-SHA-256 to give a key that unwraps the vault key, itself random and wrapped a second time by the recovery key; entries are encrypted as a single AES-256-GCM block. Nothing readable is written to disk, not even site names. Details in [docs/COFFRE-PRF.md](docs/COFFRE-PRF.md) (French).
 
 ### Install in Brave
 
@@ -58,7 +66,7 @@ mdpgen -j                           # JSON
 - **Touch ID**: WebAuthn with the platform authenticator, the extension being its own relying party. Each confirmation is an assertion whose signature, origin, challenge, RP ID and user-verification flag are checked. The key stays in Brave, on your Mac.
 - **Minimal surface**: a single permission (`storage`, for settings), a content script in an isolated Shadow DOM, a strict content security policy, no network access, no runtime dependency.
 
-What MDP Gen does not do: it does not store your passwords (that is the job of Brave's manager or your vault), and it cannot protect against a web page reading its own field, since the password is meant for that page.
+What MDP Gen cannot protect against: a web page reading its own field, since the password is meant for it, and malware running with your rights while the vault is open.
 
 ## Development
 
@@ -66,7 +74,7 @@ What MDP Gen does not do: it does not store your passwords (that is the job of B
 npm install
 npm run typecheck      # tsc -b
 npm run build          # core, CLI, extension
-npm test               # unit tests (vitest): sampling, entropy, rules, CLI
+npm test               # unit tests (vitest): sampling, entropy, rules, CLI, vault
 npm run e2e            # Playwright, headless Chromium, extension loaded, simulated Touch ID
 npm run e2e:brave      # same in Brave, visible windows
 npm run zip            # Chrome Web Store package in store/

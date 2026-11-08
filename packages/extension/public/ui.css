@@ -195,3 +195,20 @@ footer a:hover { color: var(--blue); text-decoration: none; }
 .wide-range { width: 160px; }
 .options .status#saved { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); margin: 0; padding: 6px 12px; border-radius: 8px; background: var(--group); box-shadow: 0 0 0 0.5px var(--hairline), 0 4px 16px rgba(0, 0, 0, 0.12); opacity: 0; transition: opacity 160ms ease; pointer-events: none; }
 .options .status#saved.ok { opacity: 1; }
+
+/* Coffre */
+.entries { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow: auto; }
+.entry { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.entry + .entry { border-top: 0.5px solid var(--separator); }
+.entry .text { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.entry .help { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entry code.pw { display: block; margin-top: 4px; font: 12px/1.4 var(--mono); overflow-wrap: anywhere; word-break: break-all; }
+.entry .control { gap: 2px; }
+.small-btn { min-height: 24px; padding: 2px 8px; font-size: 12px; }
+.search { width: 100%; }
+.recovery-key {
+  display: block; padding: 12px 14px; border-radius: 9px; background: var(--fill); text-align: center;
+  font: 600 17px/1.4 var(--mono); letter-spacing: 0.08em; color: var(--label);
+}
+.ack { display: flex; align-items: center; gap: 10px; }
+.links .wide { flex: 1; }
