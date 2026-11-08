@@ -28,7 +28,7 @@ function setStatus(text: string, tone: 'ok' | 'bad' | 'busy' | '' = ''): void {
     els.status.append(spinner);
   }
   els.status.append(document.createTextNode(text));
-  els.status.className = `center status ${tone === 'busy' ? '' : tone}`.trim();
+  els.status.className = `status ${tone === 'busy' ? '' : tone}`.trim();
 }
 
 async function cancel(): Promise<void> {

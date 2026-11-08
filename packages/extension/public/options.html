@@ -6,98 +6,71 @@
   <link rel="stylesheet" href="ui.css">
 </head>
 <body class="options">
-  <h1><span class="brand">MDP Gen</span> <span class="muted" data-i18n="optionsTitle"></span></h1>
-  <p class="muted" data-i18n="optionsIntro"></p>
+  <header class="hero">
+    <img class="appicon" src="icons/icon128.png" alt="">
+    <h1>MDP Gen</h1>
+    <p data-i18n="optionsIntro"></p>
+  </header>
 
   <h2 data-i18n="optionsSectionPassword"></h2>
-  <div class="section">
-    <div class="option">
-      <label class="field">
-        <span data-i18n="popupLength"></span>
-        <span class="row"><input type="range" id="length" min="4" max="128" step="1"><input type="number" id="lengthNumber" min="4" max="128" step="1" class="w5"></span>
-      </label>
+  <section class="group">
+    <div class="row">
+      <span class="text"><span class="label" data-i18n="popupLength"></span></span>
+      <span class="control">
+        <input type="range" id="length" min="4" max="128" step="1" class="wide-range">
+        <input type="number" id="lengthNumber" class="num" min="4" max="128" step="1">
+      </span>
     </div>
-    <div class="option">
-      <label><input type="checkbox" id="upper"><span data-i18n="optUpper"></span></label>
-      <label><input type="checkbox" id="lower"><span data-i18n="optLower"></span></label>
-      <label><input type="checkbox" id="digits"><span data-i18n="optDigits"></span></label>
-      <label><input type="checkbox" id="symbols"><span data-i18n="optSymbols"></span></label>
-      <label class="field mt6">
-        <span data-i18n="optSymbolSet"></span>
-        <input type="text" id="symbolSet" spellcheck="false" autocomplete="off">
-        <span class="help" data-i18n="optSymbolSetHelp"></span>
-      </label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optUpper"></span></span><input type="checkbox" class="switch" id="upper"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optLower"></span></span><input type="checkbox" class="switch" id="lower"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optDigits"></span></span><input type="checkbox" class="switch" id="digits"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optSymbols"></span></span><input type="checkbox" class="switch" id="symbols"></label>
+    <div class="row">
+      <span class="text"><span class="label" data-i18n="optSymbolSet"></span><span class="help" data-i18n="optSymbolSetHelp"></span></span>
+      <span class="control"><input type="text" id="symbolSet" class="wide" spellcheck="false" autocomplete="off"></span>
     </div>
-    <div class="option">
-      <label><input type="checkbox" id="requireEach"><span data-i18n="optRequireEach"></span></label>
-      <span class="help" data-i18n="optRequireEachHelp"></span>
+    <label class="row"><span class="text"><span class="label" data-i18n="optRequireEach"></span><span class="help" data-i18n="optRequireEachHelp"></span></span><input type="checkbox" class="switch" id="requireEach"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optExcludeAmbiguous"></span><span class="help" data-i18n="optExcludeAmbiguousHelp"></span></span><input type="checkbox" class="switch" id="excludeAmbiguous"></label>
+    <div class="row">
+      <span class="text"><span class="label" data-i18n="optMaxConsecutive"></span><span class="help" data-i18n="optMaxConsecutiveHelp"></span></span>
+      <span class="control"><input type="number" id="maxConsecutive" class="num" min="0" max="16" step="1"></span>
     </div>
-    <div class="option">
-      <label><input type="checkbox" id="excludeAmbiguous"><span data-i18n="optExcludeAmbiguous"></span></label>
-      <span class="help" data-i18n="optExcludeAmbiguousHelp"></span>
-    </div>
-    <div class="option">
-      <label class="field">
-        <span data-i18n="optMaxConsecutive"></span>
-        <input type="number" id="maxConsecutive" min="0" max="16" step="1" class="w5">
-        <span class="help" data-i18n="optMaxConsecutiveHelp"></span>
-      </label>
-    </div>
-    <p class="meta" id="preview"></p>
-  </div>
+    <div class="row"><span class="text"><span class="help mono" id="preview"></span></span></div>
+  </section>
 
   <h2 data-i18n="optionsSectionBehaviour"></h2>
-  <div class="section">
-    <div class="option">
-      <label><input type="checkbox" id="autoSuggest"><span data-i18n="optAutoSuggest"></span></label>
-      <span class="help" data-i18n="optAutoSuggestHelp"></span>
+  <section class="group">
+    <label class="row"><span class="text"><span class="label" data-i18n="optAutoSuggest"></span><span class="help" data-i18n="optAutoSuggestHelp"></span></span><input type="checkbox" class="switch" id="autoSuggest"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optShowOnAll"></span><span class="help" data-i18n="optShowOnAllHelp"></span></span><input type="checkbox" class="switch" id="showOnAllPasswordFields"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optSubmitAfterFill"></span><span class="help" data-i18n="optSubmitAfterFillHelp"></span></span><input type="checkbox" class="switch" id="submitAfterFill"></label>
+    <div class="row">
+      <span class="text"><span class="label" data-i18n="optRetain"></span><span class="help" data-i18n="optRetainHelp"></span></span>
+      <span class="control"><input type="number" id="retainMinutes" class="num" min="0" max="1440" step="1"></span>
     </div>
-    <div class="option">
-      <label><input type="checkbox" id="showOnAllPasswordFields"><span data-i18n="optShowOnAll"></span></label>
-      <span class="help" data-i18n="optShowOnAllHelp"></span>
-    </div>
-    <div class="option">
-      <label><input type="checkbox" id="submitAfterFill"><span data-i18n="optSubmitAfterFill"></span></label>
-      <span class="help" data-i18n="optSubmitAfterFillHelp"></span>
-    </div>
-    <div class="option">
-      <label class="field">
-        <span data-i18n="optRetain"></span>
-        <input type="number" id="retainMinutes" min="0" max="1440" step="1" class="w5">
-        <span class="help" data-i18n="optRetainHelp"></span>
-      </label>
-    </div>
-  </div>
+  </section>
 
   <h2 data-i18n="optionsSectionTouchId"></h2>
-  <div class="section">
-    <div class="option">
-      <label><input type="checkbox" id="touchId"><span data-i18n="optTouchId"></span></label>
-      <span class="help" data-i18n="optTouchIdHelp"></span>
-    </div>
-    <div class="option">
-      <p id="touchIdStatus" class="muted"></p>
-      <div class="row wrap">
+  <section class="group">
+    <label class="row"><span class="text"><span class="label" data-i18n="optTouchId"></span><span class="help" data-i18n="optTouchIdHelp"></span></span><input type="checkbox" class="switch" id="touchId"></label>
+    <div class="row">
+      <span class="text"><span class="label" id="touchIdStatus"></span><span class="help status" id="touchIdResult" aria-live="polite"></span></span>
+      <span class="control">
         <button type="button" class="btn" id="touchIdEnroll" data-i18n="optTouchIdEnroll"></button>
         <button type="button" class="btn" id="touchIdTest" data-i18n="optTouchIdTest"></button>
         <button type="button" class="btn danger" id="touchIdReset" data-i18n="optTouchIdReset"></button>
-      </div>
-      <p class="status" id="touchIdResult" aria-live="polite"></p>
+      </span>
     </div>
-  </div>
+  </section>
 
   <h2 data-i18n="optionsSectionAbout"></h2>
-  <div class="section">
-    <div class="option">
-      <p data-i18n="aboutPrivacy"></p>
-      <p data-i18n="aboutRandom"></p>
-      <div class="row wrap">
-        <button type="button" class="btn danger" id="reset" data-i18n="optionsReset"></button>
-        <a class="link" href="https://github.com/Lax3n/mdpgen" target="_blank" rel="noopener">GitHub</a>
-        <span class="muted" id="version"></span>
-      </div>
+  <section class="group">
+    <div class="row"><span class="text"><span class="help" data-i18n="aboutPrivacy"></span></span></div>
+    <div class="row"><span class="text"><span class="help" data-i18n="aboutRandom"></span></span></div>
+    <div class="row">
+      <span class="text"><span class="help"><a href="https://github.com/Lax3n/mdpgen" target="_blank" rel="noopener">GitHub</a> · <span id="version"></span></span></span>
+      <span class="control"><button type="button" class="btn danger" id="reset" data-i18n="optionsReset"></button></span>
     </div>
-  </div>
+  </section>
   <p class="status" id="saved" aria-live="polite"></p>
   <script type="module" src="options.js"></script>
 </body>

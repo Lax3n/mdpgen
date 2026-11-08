@@ -5,6 +5,8 @@ import { isVisible } from './detect.js';
 import { BUBBLE_CSS } from './styles.js';
 import { ICON_EYE, ICON_EYE_OFF, ICON_FINGERPRINT, ICON_KEY, ICON_REFRESH, icon, mask } from '../shared/icons.js';
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
 export interface BubbleState {
   password: string;
   bits: number;
@@ -34,6 +36,8 @@ export class Bubble {
   readonly host: HTMLElement;
   private readonly root: ShadowRoot;
   private readonly card: HTMLDivElement;
+  private readonly arrow: SVGSVGElement;
+  private readonly dot: HTMLElement;
   private readonly value: HTMLElement;
   private readonly eye: HTMLButtonElement;
   private readonly regen: HTMLButtonElement;
@@ -56,16 +60,26 @@ export class Bubble {
     const style = document.createElement('style');
     style.textContent = BUBBLE_CSS;
 
-    this.card = el('div', 'card');
+    this.card = el('div', 'popover');
     this.card.setAttribute('role', 'dialog');
     this.card.setAttribute('aria-label', t('extName'));
 
-    const head = el('div', 'head');
-    const brand = el('span', 'brand');
-    brand.append(icon(ICON_KEY), document.createTextNode('MDP Gen'));
-    head.append(brand, el('span', 'title', t('bubbleTitle')));
+    this.arrow = document.createElementNS(SVG_NS, 'svg');
+    this.arrow.setAttribute('class', 'arrow');
+    this.arrow.setAttribute('viewBox', '0 0 22 10');
+    this.arrow.setAttribute('aria-hidden', 'true');
+    const arrowPath = document.createElementNS(SVG_NS, 'path');
+    arrowPath.setAttribute('d', 'M0 10.5 L11 0.5 L22 10.5');
+    this.arrow.append(arrowPath);
 
-    const pw = el('div', 'pw');
+    const head = el('div', 'header');
+    const title = el('span', 'title');
+    const glyph = el('span', 'glyph');
+    glyph.append(icon(ICON_KEY));
+    title.append(glyph, document.createTextNode(t('bubbleTitle')));
+    head.append(title, el('span', 'brand', 'MDP Gen'));
+
+    const pw = el('div', 'field');
     this.value = el('code', 'value masked');
     this.eye = el('button', 'icon eye');
     this.eye.type = 'button';
@@ -79,9 +93,10 @@ export class Bubble {
     pw.append(this.value, this.eye, this.regen);
 
     const meta = el('div', 'meta');
+    this.dot = el('span', 'dot');
     this.bits = el('span', 'bits');
     this.strength = el('span', 'strength');
-    meta.append(this.bits, document.createTextNode(' · '), this.strength);
+    meta.append(this.dot, this.strength, document.createTextNode('·'), this.bits);
 
     const actions = el('div', 'actions');
     this.use = el('button', 'btn primary use');
@@ -97,7 +112,7 @@ export class Bubble {
     this.error = el('div', 'error');
     this.error.hidden = true;
 
-    const foot = el('div', 'foot');
+    const foot = el('div', 'footer');
     const dismiss = el('button', 'link dismiss', t('bubbleDismiss'));
     dismiss.type = 'button';
     dismiss.dataset.action = 'dismiss';
@@ -106,7 +121,7 @@ export class Bubble {
     options.dataset.action = 'options';
     foot.append(dismiss, document.createTextNode('·'), options);
 
-    this.card.append(head, pw, meta, actions, this.error, foot);
+    this.card.append(this.arrow, head, pw, meta, actions, this.error, foot);
     this.root.append(style, this.card);
 
     // Le clic dans la bulle ne doit pas retirer le focus du champ.
@@ -190,9 +205,18 @@ export class Bubble {
     this.card.style.width = `${width}px`;
     const height = this.card.offsetHeight;
     const margin = 8;
+    const gap = 10;
     const left = Math.max(margin, Math.min(rect.left, window.innerWidth - width - margin));
-    let top = rect.bottom + 6;
-    if (top + height > window.innerHeight - margin && rect.top - height - 6 >= margin) top = rect.top - height - 6;
+    let top = rect.bottom + gap;
+    let placement: 'below' | 'above' = 'below';
+    if (top + height > window.innerHeight - margin && rect.top - height - gap >= margin) {
+      top = rect.top - height - gap;
+      placement = 'above';
+    }
+    if (this.host.dataset.placement !== placement) this.host.dataset.placement = placement;
+    // La flèche vise le début du champ, sans sortir des coins arrondis.
+    const arrowLeft = Math.max(14, Math.min(width - 36, rect.left + 18 - left));
+    this.arrow.style.left = `${Math.round(arrowLeft)}px`;
     this.host.style.transform = `translate(${Math.round(left)}px, ${Math.round(top)}px)`;
   }
 
@@ -214,6 +238,7 @@ export class Bubble {
     this.bits.textContent = t('bubbleBits', String(Math.floor(bits)));
     this.strength.textContent = strengthLabel(strength);
     this.strength.className = `strength strength-${strength}`;
+    this.dot.className = `dot strength-${strength}`;
     this.use.textContent = t(autofilled ? 'bubbleKeep' : 'bubbleUse');
     this.touchLabel.textContent = busy ? t('bubbleBusy') : t(touchId ? 'bubbleTouchId' : 'bubbleFillSubmit');
     this.use.disabled = busy;

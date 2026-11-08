@@ -6,18 +6,18 @@
   <link rel="stylesheet" href="ui.css">
 </head>
 <body class="popup">
-  <header class="row between">
-    <h1><span class="brand">MDP Gen</span> <span class="muted" data-i18n="popupTitle"></span></h1>
+  <header class="titlebar">
+    <img class="appicon" src="icons/icon48.png" alt="">
+    <h1>MDP Gen</h1>
+    <span class="spacer"></span>
     <button type="button" class="icon" id="regenerate" data-i18n-title="bubbleAnother" data-i18n-aria="bubbleAnother"></button>
   </header>
 
-  <section class="card mt10">
-    <div class="password">
-      <code id="password" class="masked" aria-live="polite"></code>
-      <button type="button" class="icon" id="reveal" data-i18n-title="bubbleReveal" data-i18n-aria="bubbleReveal"></button>
-    </div>
-  </section>
-  <div class="meta"><span id="bits"></span> · <span id="strength"></span></div>
+  <div class="lozenge">
+    <code id="password" class="masked" aria-live="polite"></code>
+    <button type="button" class="icon" id="reveal" data-i18n-title="bubbleReveal" data-i18n-aria="bubbleReveal"></button>
+  </div>
+  <div class="meta"><span class="dot" id="dot"></span><span id="strength"></span>·<span id="bits"></span></div>
 
   <div class="actions">
     <button type="button" class="btn" id="copy" data-i18n="popupCopy"></button>
@@ -26,32 +26,34 @@
   </div>
   <div class="status" id="status" aria-live="polite"></div>
 
-  <section class="quick">
-    <label class="length row">
-      <span data-i18n="popupLength"></span>
-      <input type="range" id="length" min="8" max="64" step="1">
-      <output id="lengthValue"></output>
-    </label>
-    <label><input type="checkbox" id="upper"><span data-i18n="optUpper"></span></label>
-    <label><input type="checkbox" id="lower"><span data-i18n="optLower"></span></label>
-    <label><input type="checkbox" id="digits"><span data-i18n="optDigits"></span></label>
-    <label><input type="checkbox" id="symbols"><span data-i18n="optSymbols"></span></label>
+  <section class="group mt8">
+    <div class="row">
+      <span class="label" data-i18n="popupLength"></span>
+      <input type="range" id="length" min="8" max="64" step="1" aria-labelledby="lengthLabel">
+      <output id="lengthValue" class="num"></output>
+    </div>
+    <label class="row"><span class="text"><span class="label" data-i18n="optUpper"></span></span><input type="checkbox" class="switch" id="upper"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optLower"></span></span><input type="checkbox" class="switch" id="lower"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optDigits"></span></span><input type="checkbox" class="switch" id="digits"></label>
+    <label class="row"><span class="text"><span class="label" data-i18n="optSymbols"></span></span><input type="checkbox" class="switch" id="symbols"></label>
   </section>
 
-  <section class="card mt12" id="last" hidden>
-    <div class="row between">
-      <strong data-i18n="popupLast"></strong>
-      <span class="muted" id="lastMeta"></span>
+  <section class="group mt12" id="last" hidden>
+    <div class="row stack">
+      <div class="text split">
+        <span class="label strong" data-i18n="popupLast"></span>
+        <span class="help" id="lastMeta"></span>
+      </div>
+      <div class="lozenge">
+        <code id="lastValue" class="masked"></code>
+        <button type="button" class="icon" id="lastReveal" data-i18n-title="bubbleReveal" data-i18n-aria="bubbleReveal"></button>
+      </div>
+      <div class="links">
+        <button type="button" class="link-btn" id="lastCopy" data-i18n="popupCopy"></button>
+        <button type="button" class="link-btn" id="lastForget" data-i18n="popupForget"></button>
+      </div>
+      <span class="help" data-i18n="popupLastHelp"></span>
     </div>
-    <div class="password mt6">
-      <code id="lastValue" class="masked"></code>
-      <button type="button" class="icon" id="lastReveal" data-i18n-title="bubbleReveal" data-i18n-aria="bubbleReveal"></button>
-    </div>
-    <div class="row mt8 gap10">
-      <button type="button" class="link-btn" id="lastCopy" data-i18n="popupCopy"></button>
-      <button type="button" class="link-btn" id="lastForget" data-i18n="popupForget"></button>
-    </div>
-    <p class="help" data-i18n="popupLastHelp"></p>
   </section>
 
   <footer>

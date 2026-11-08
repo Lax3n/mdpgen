@@ -25,6 +25,7 @@ const els = {
   regenerate: $<HTMLButtonElement>('regenerate'),
   bits: $<HTMLElement>('bits'),
   strength: $<HTMLElement>('strength'),
+  dot: $<HTMLElement>('dot'),
   copy: $<HTMLButtonElement>('copy'),
   insert: $<HTMLButtonElement>('insert'),
   touchid: $<HTMLButtonElement>('touchid'),
@@ -71,6 +72,7 @@ function renderPassword(): void {
   els.bits.textContent = t('bubbleBits', String(Math.floor(suggestion.bits)));
   els.strength.textContent = strengthLabel(suggestion.strength);
   els.strength.className = `strength-${suggestion.strength}`;
+  els.dot.className = `dot strength-${suggestion.strength}`;
 }
 
 function regenerate(): void {
