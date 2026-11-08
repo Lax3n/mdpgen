@@ -76,6 +76,20 @@ async function openConfirmation(
 ): Promise<{ requestId: string }> {
   const tabId = sender.tab?.id;
   if (tabId === undefined || sender.frameId === undefined) throw new Error('Demande hors d’un onglet.');
+
+  // Une seule fenêtre par cadre : si une demande est déjà ouverte, on la met à jour et on la ramène devant.
+  const existing = await findPendingForFrame(tabId, sender.frameId);
+  if (existing && existing.pending.windowId !== null) {
+    try {
+      await chrome.windows.get(existing.pending.windowId);
+      await chrome.storage.session.set({ [existing.key]: { ...existing.pending, password, submit, host } });
+      await chrome.windows.update(existing.pending.windowId, { focused: true });
+      return { requestId: existing.key.slice(PENDING_PREFIX.length) };
+    } catch {
+      await chrome.storage.session.remove(existing.key);
+    }
+  }
+
   const requestId = crypto.randomUUID();
   const pending: Pending = { tabId, frameId: sender.frameId, windowId: null, password, submit, host, at: Date.now() };
   await chrome.storage.session.set({ [PENDING_PREFIX + requestId]: pending });
@@ -108,6 +122,27 @@ async function openConfirmation(
   await chrome.storage.session.set({ [PENDING_PREFIX + requestId]: pending });
   setTimeout(() => void expirePending(requestId), PENDING_TTL_MS);
   return { requestId };
+}
+
+async function findPendingForFrame(tabId: number, frameId: number): Promise<{ key: string; pending: Pending } | null> {
+  const all = await chrome.storage.session.get(null);
+  for (const [key, value] of Object.entries(all)) {
+    if (!key.startsWith(PENDING_PREFIX)) continue;
+    const pending = value as Pending;
+    if (pending.tabId === tabId && pending.frameId === frameId && Date.now() - pending.at <= PENDING_TTL_MS) {
+      return { key, pending };
+    }
+  }
+  return null;
+}
+
+/** Prévient la page que la demande s'est terminée sans remplissage, pour que la bulle redevienne utilisable. */
+async function notifyCancelled(pending: Pending): Promise<void> {
+  try {
+    await chrome.tabs.sendMessage(pending.tabId, { type: 'mdpgen:confirm-cancelled' }, { frameId: pending.frameId });
+  } catch {
+    // Onglet fermé ou script absent.
+  }
 }
 
 async function readPending(requestId: string): Promise<Pending> {
@@ -145,7 +180,10 @@ async function cancelConfirmation(requestId: string): Promise<void> {
   const stored = await chrome.storage.session.get(key);
   const pending = stored[key] as Pending | undefined;
   await chrome.storage.session.remove(key);
-  if (pending) await closeWindow(pending.windowId);
+  if (pending) {
+    await closeWindow(pending.windowId);
+    await notifyCancelled(pending);
+  }
 }
 
 async function expirePending(requestId: string): Promise<void> {
@@ -155,13 +193,16 @@ async function expirePending(requestId: string): Promise<void> {
   if (!pending) return;
   await chrome.storage.session.remove(key);
   await closeWindow(pending.windowId);
+  await notifyCancelled(pending);
 }
 
 async function dropPendingForWindow(windowId: number): Promise<void> {
   const all = await chrome.storage.session.get(null);
   for (const [key, value] of Object.entries(all)) {
-    if (key.startsWith(PENDING_PREFIX) && (value as Pending).windowId === windowId) {
+    const pending = value as Pending;
+    if (key.startsWith(PENDING_PREFIX) && pending.windowId === windowId) {
       await chrome.storage.session.remove(key);
+      await notifyCancelled(pending);
     }
   }
 }

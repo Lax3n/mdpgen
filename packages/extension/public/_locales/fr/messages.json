@@ -1,92 +1,327 @@
 {
-  "extName": { "message": "MDP Gen : mots de passe robustes" },
-  "extDescription": { "message": "Propose un mot de passe vraiment aléatoire dès qu'un site vous en demande un nouveau, le remplit et le valide avec Touch ID. Rien n'est stocké, rien ne quitte votre Mac." },
-  "bubbleTitle": { "message": "Mot de passe robuste" },
-  "bubbleUse": { "message": "Utiliser" },
-  "bubbleKeep": { "message": "Garder celui-ci" },
-  "bubbleAnother": { "message": "Un autre" },
-  "bubbleTouchId": { "message": "Touch ID et valider" },
-  "bubbleFillSubmit": { "message": "Remplir et valider" },
-  "bubbleBusy": { "message": "Touch ID…" },
-  "bubbleDismiss": { "message": "Ne pas utiliser" },
-  "bubbleOptions": { "message": "Options" },
-  "bubbleReveal": { "message": "Afficher le mot de passe" },
-  "bubbleHide": { "message": "Masquer le mot de passe" },
-  "bubbleBits": { "message": "$1 bits d'entropie", "placeholders": { "1": { "content": "$1" } } },
-  "strength_weak": { "message": "faible" },
-  "strength_fair": { "message": "moyen" },
-  "strength_good": { "message": "bon" },
-  "strength_strong": { "message": "fort" },
-  "strength_excellent": { "message": "très fort" },
-  "popupTitle": { "message": "Générateur" },
-  "popupCopy": { "message": "Copier" },
-  "popupCopied": { "message": "Copié dans le presse-papiers." },
-  "popupCopyFailed": { "message": "Copie impossible." },
-  "popupInsert": { "message": "Insérer dans la page" },
-  "popupInserted": { "message": "Inséré sur $1.", "placeholders": { "1": { "content": "$1" } } },
-  "popupNoField": { "message": "Aucun champ mot de passe sur cette page." },
-  "popupTouchId": { "message": "Touch ID : remplir et valider" },
-  "popupTouchIdFill": { "message": "Remplir et valider" },
-  "popupLength": { "message": "Longueur" },
-  "optUpper": { "message": "Majuscules" },
-  "optLower": { "message": "Minuscules" },
-  "optDigits": { "message": "Chiffres" },
-  "optSymbols": { "message": "Symboles" },
-  "popupLast": { "message": "Dernier mot de passe proposé" },
-  "popupLastMeta": { "message": "$1 · il y a $2 min", "placeholders": { "1": { "content": "$1" }, "2": { "content": "$2" } } },
-  "popupLastHelp": { "message": "Gardé en mémoire de session seulement, le temps que Brave vous propose de l'enregistrer. Il disparaît à la fermeture du navigateur." },
-  "popupForget": { "message": "Oublier" },
-  "popupTouchIdRequired": { "message": "Touch ID requis." },
-  "confirmTitle": { "message": "Confirmation" },
-  "confirmFill": { "message": "Remplir un mot de passe robuste sur $1.", "placeholders": { "1": { "content": "$1" } } },
-  "confirmFillSubmit": { "message": "Remplir un mot de passe robuste sur $1 et valider le formulaire.", "placeholders": { "1": { "content": "$1" } } },
-  "confirmTouch": { "message": "Touchez le capteur Touch ID." },
-  "confirmEnroll": { "message": "Première utilisation : Touch ID va créer la clé de MDP Gen sur ce Mac." },
-  "confirmRetry": { "message": "Réessayer" },
-  "confirmCancel": { "message": "Annuler" },
-  "confirmWithout": { "message": "Continuer sans Touch ID" },
-  "confirmCancelled": { "message": "Annulé ou expiré." },
-  "confirmUnsupported": { "message": "Touch ID n'est pas disponible ici." },
-  "confirmFailed": { "message": "Échec : $1", "placeholders": { "1": { "content": "$1" } } },
-  "confirmDone": { "message": "Rempli. Brave va vous proposer d'enregistrer ce mot de passe." },
-  "confirmFillFailed": { "message": "Le champ n'a pas pu être rempli. Rechargez la page et réessayez." },
-  "optionsTitle": { "message": "Options" },
-  "optionsIntro": { "message": "Tout se règle ici. Aucun mot de passe n'est jamais enregistré sur disque, aucune donnée ne quitte votre machine." },
-  "optionsSectionPassword": { "message": "Mot de passe" },
-  "optionsSectionBehaviour": { "message": "Comportement" },
-  "optionsSectionTouchId": { "message": "Touch ID" },
-  "optionsSectionAbout": { "message": "À propos" },
-  "optSymbolSet": { "message": "Jeu de symboles" },
-  "optSymbolSetHelp": { "message": "Ponctuation ASCII seulement. Le jeu par défaut évite les guillemets, l'apostrophe, la barre oblique et la barre verticale, souvent refusés." },
-  "optRequireEach": { "message": "Au moins un caractère de chaque jeu actif" },
-  "optRequireEachHelp": { "message": "Garantit majuscule, minuscule, chiffre et symbole. Le tirage reste uniforme parmi les mots de passe qui respectent cette règle." },
-  "optExcludeAmbiguous": { "message": "Éviter les caractères ambigus (0 O 1 l I |)" },
-  "optExcludeAmbiguousHelp": { "message": "Utile si vous devez recopier le mot de passe à la main." },
-  "optMaxConsecutive": { "message": "Série maximale de caractères identiques (0 = sans limite)" },
-  "optMaxConsecutiveHelp": { "message": "Certains sites refusent « aaa ». L'entropie affichée tient compte de cette règle." },
-  "optAutoSuggest": { "message": "Proposer automatiquement sur les champs de création" },
-  "optAutoSuggestHelp": { "message": "Comme Safari : dès que le champ reçoit le focus, un mot de passe robuste est rempli et une bulle vous laisse le garder, en tirer un autre ou le refuser. Tapez n'importe quoi et la proposition s'efface." },
-  "optShowOnAll": { "message": "Proposer aussi sur les champs de connexion" },
-  "optShowOnAllHelp": { "message": "Par défaut, la bulle n'apparaît que sur les formulaires d'inscription et de changement de mot de passe." },
-  "optSubmitAfterFill": { "message": "Valider le formulaire après Touch ID" },
-  "optSubmitAfterFillHelp": { "message": "Le formulaire n'est envoyé que s'il est complet et valide ; sinon le champ manquant est signalé." },
-  "optRetain": { "message": "Garder le dernier mot de passe proposé (minutes, 0 = jamais)" },
-  "optRetainHelp": { "message": "En mémoire de session uniquement, jamais sur disque : un filet si Brave n'a pas proposé l'enregistrement. Consultable depuis le popup, derrière Touch ID." },
-  "optTouchId": { "message": "Confirmer avec Touch ID" },
-  "optTouchIdHelp": { "message": "Utilise l'authentificateur de plateforme (WebAuthn). La clé reste dans Brave, sur ce Mac. Désactivé, le bouton remplit et valide sur simple clic." },
-  "optTouchIdEnroll": { "message": "Activer Touch ID" },
-  "optTouchIdTest": { "message": "Tester" },
-  "optTouchIdReset": { "message": "Réinitialiser" },
-  "touchIdStatusUnsupported": { "message": "WebAuthn n'est pas disponible dans ce navigateur." },
-  "touchIdStatusUnavailable": { "message": "Aucun authentificateur de plateforme (Touch ID) détecté." },
-  "touchIdStatusNotEnrolled": { "message": "Touch ID n'est pas encore activé pour MDP Gen." },
-  "touchIdStatusEnrolled": { "message": "Touch ID activé le $1.", "placeholders": { "1": { "content": "$1" } } },
-  "touchIdOk": { "message": "Touch ID vérifié." },
-  "touchIdEnrolled": { "message": "Touch ID activé." },
-  "touchIdResetDone": { "message": "Clé supprimée. Elle sera recréée au prochain usage." },
-  "aboutPrivacy": { "message": "MDP Gen ne stocke aucun mot de passe, n'envoie rien sur le réseau et ne contient aucune télémétrie. Seuls ces réglages sont enregistrés." },
-  "aboutRandom": { "message": "Source d'aléa : le générateur cryptographique du navigateur (crypto.getRandomValues), alimenté sur Mac par le générateur matériel d'Apple. Chaque caractère est tiré par rejet, sans biais de modulo." },
-  "optionsReset": { "message": "Rétablir les valeurs par défaut" },
-  "optionsSaved": { "message": "Enregistré." },
-  "previewLine": { "message": "Exemple : $1 — $2 bits, $3.", "placeholders": { "1": { "content": "$1" }, "2": { "content": "$2" }, "3": { "content": "$3" } } }
+  "extName": {
+    "message": "MDP Gen : mots de passe robustes"
+  },
+  "extDescription": {
+    "message": "Propose un mot de passe vraiment aléatoire dès qu'un site vous en demande un nouveau, le remplit et le valide avec Touch ID. Rien n'est stocké, rien ne quitte votre Mac."
+  },
+  "bubbleTitle": {
+    "message": "Mot de passe robuste"
+  },
+  "bubbleUse": {
+    "message": "Utiliser"
+  },
+  "bubbleKeep": {
+    "message": "Garder celui-ci"
+  },
+  "bubbleAnother": {
+    "message": "Un autre"
+  },
+  "bubbleTouchId": {
+    "message": "Touch ID et valider"
+  },
+  "bubbleFillSubmit": {
+    "message": "Remplir et valider"
+  },
+  "bubbleBusy": {
+    "message": "Touch ID…"
+  },
+  "bubbleDismiss": {
+    "message": "Ne pas utiliser"
+  },
+  "bubbleOptions": {
+    "message": "Options"
+  },
+  "bubbleReveal": {
+    "message": "Afficher le mot de passe"
+  },
+  "bubbleHide": {
+    "message": "Masquer le mot de passe"
+  },
+  "bubbleBits": {
+    "message": "$1 bits d'entropie",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "strength_weak": {
+    "message": "faible"
+  },
+  "strength_fair": {
+    "message": "moyen"
+  },
+  "strength_good": {
+    "message": "bon"
+  },
+  "strength_strong": {
+    "message": "fort"
+  },
+  "strength_excellent": {
+    "message": "très fort"
+  },
+  "popupTitle": {
+    "message": "Générateur"
+  },
+  "popupCopy": {
+    "message": "Copier"
+  },
+  "popupCopied": {
+    "message": "Copié dans le presse-papiers."
+  },
+  "popupCopyFailed": {
+    "message": "Copie impossible."
+  },
+  "popupInsert": {
+    "message": "Insérer dans la page"
+  },
+  "popupInserted": {
+    "message": "Inséré sur $1.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupNoField": {
+    "message": "Aucun champ mot de passe sur cette page."
+  },
+  "popupTouchId": {
+    "message": "Touch ID : remplir et valider"
+  },
+  "popupTouchIdFill": {
+    "message": "Remplir et valider"
+  },
+  "popupLength": {
+    "message": "Longueur"
+  },
+  "optUpper": {
+    "message": "Majuscules"
+  },
+  "optLower": {
+    "message": "Minuscules"
+  },
+  "optDigits": {
+    "message": "Chiffres"
+  },
+  "optSymbols": {
+    "message": "Symboles"
+  },
+  "popupLast": {
+    "message": "Dernier mot de passe proposé"
+  },
+  "popupLastMeta": {
+    "message": "$1 · il y a $2 min",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      },
+      "2": {
+        "content": "$2"
+      }
+    }
+  },
+  "popupLastHelp": {
+    "message": "Gardé en mémoire de session seulement, le temps que Brave vous propose de l'enregistrer. Il disparaît à la fermeture du navigateur."
+  },
+  "popupForget": {
+    "message": "Oublier"
+  },
+  "popupTouchIdRequired": {
+    "message": "Touch ID requis."
+  },
+  "confirmTitle": {
+    "message": "Confirmation"
+  },
+  "confirmFill": {
+    "message": "Remplir un mot de passe robuste sur $1.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmFillSubmit": {
+    "message": "Remplir un mot de passe robuste sur $1 et valider le formulaire.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmTouch": {
+    "message": "Touchez le capteur Touch ID."
+  },
+  "confirmEnroll": {
+    "message": "Première utilisation : Touch ID va créer la clé de MDP Gen sur ce Mac."
+  },
+  "confirmRetry": {
+    "message": "Réessayer"
+  },
+  "confirmCancel": {
+    "message": "Annuler"
+  },
+  "confirmWithout": {
+    "message": "Continuer sans Touch ID"
+  },
+  "confirmCancelled": {
+    "message": "Annulé ou expiré."
+  },
+  "confirmUnsupported": {
+    "message": "Touch ID n'est pas disponible ici."
+  },
+  "confirmFailed": {
+    "message": "Échec : $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmDone": {
+    "message": "Rempli. Brave va vous proposer d'enregistrer ce mot de passe."
+  },
+  "confirmFillFailed": {
+    "message": "Le champ n'a pas pu être rempli. Rechargez la page et réessayez."
+  },
+  "optionsTitle": {
+    "message": "Options"
+  },
+  "optionsIntro": {
+    "message": "Tout se règle ici. Aucun mot de passe n'est jamais enregistré sur disque, aucune donnée ne quitte votre machine."
+  },
+  "optionsSectionPassword": {
+    "message": "Mot de passe"
+  },
+  "optionsSectionBehaviour": {
+    "message": "Comportement"
+  },
+  "optionsSectionTouchId": {
+    "message": "Touch ID"
+  },
+  "optionsSectionAbout": {
+    "message": "À propos"
+  },
+  "optSymbolSet": {
+    "message": "Jeu de symboles"
+  },
+  "optSymbolSetHelp": {
+    "message": "Ponctuation ASCII seulement. Le jeu par défaut évite les guillemets, l'apostrophe, la barre oblique et la barre verticale, souvent refusés."
+  },
+  "optRequireEach": {
+    "message": "Au moins un caractère de chaque jeu actif"
+  },
+  "optRequireEachHelp": {
+    "message": "Garantit majuscule, minuscule, chiffre et symbole. Le tirage reste uniforme parmi les mots de passe qui respectent cette règle."
+  },
+  "optExcludeAmbiguous": {
+    "message": "Éviter les caractères ambigus (0 O 1 l I |)"
+  },
+  "optExcludeAmbiguousHelp": {
+    "message": "Utile si vous devez recopier le mot de passe à la main."
+  },
+  "optMaxConsecutive": {
+    "message": "Série maximale de caractères identiques (0 = sans limite)"
+  },
+  "optMaxConsecutiveHelp": {
+    "message": "Certains sites refusent « aaa ». L'entropie affichée tient compte de cette règle."
+  },
+  "optAutoSuggest": {
+    "message": "Proposer automatiquement sur les champs de création"
+  },
+  "optAutoSuggestHelp": {
+    "message": "Comme Safari : dès que le champ reçoit le focus, un mot de passe robuste est rempli et une bulle vous laisse le garder, en tirer un autre ou le refuser. Tapez n'importe quoi et la proposition s'efface."
+  },
+  "optShowOnAll": {
+    "message": "Proposer aussi sur les champs de connexion"
+  },
+  "optShowOnAllHelp": {
+    "message": "Par défaut, la bulle n'apparaît que sur les formulaires d'inscription et de changement de mot de passe."
+  },
+  "optSubmitAfterFill": {
+    "message": "Valider le formulaire après Touch ID"
+  },
+  "optSubmitAfterFillHelp": {
+    "message": "Le formulaire n'est envoyé que s'il est complet et valide ; sinon le champ manquant est signalé."
+  },
+  "optRetain": {
+    "message": "Garder le dernier mot de passe proposé (minutes, 0 = jamais)"
+  },
+  "optRetainHelp": {
+    "message": "En mémoire de session uniquement, jamais sur disque : un filet si Brave n'a pas proposé l'enregistrement. Consultable depuis le popup, derrière Touch ID."
+  },
+  "optTouchId": {
+    "message": "Confirmer avec Touch ID"
+  },
+  "optTouchIdHelp": {
+    "message": "Utilise l'authentificateur de plateforme (WebAuthn). La clé reste dans Brave, sur ce Mac. Désactivé, le bouton remplit et valide sur simple clic."
+  },
+  "optAutoTouchId": {
+    "message": "Demander Touch ID dès la proposition"
+  },
+  "optAutoTouchIdHelp": {
+    "message": "Dès que la bulle apparaît, Touch ID est demandé : un doigt suffit pour remplir et valider, sans appuyer sur le bouton. Annulez pour garder la main ; la bulle reste là."
+  },
+  "optTouchIdEnroll": {
+    "message": "Activer Touch ID"
+  },
+  "optTouchIdTest": {
+    "message": "Tester"
+  },
+  "optTouchIdReset": {
+    "message": "Réinitialiser"
+  },
+  "touchIdStatusUnsupported": {
+    "message": "WebAuthn n'est pas disponible dans ce navigateur."
+  },
+  "touchIdStatusUnavailable": {
+    "message": "Aucun authentificateur de plateforme (Touch ID) détecté."
+  },
+  "touchIdStatusNotEnrolled": {
+    "message": "Touch ID n'est pas encore activé pour MDP Gen."
+  },
+  "touchIdStatusEnrolled": {
+    "message": "Touch ID activé le $1.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "touchIdOk": {
+    "message": "Touch ID vérifié."
+  },
+  "touchIdEnrolled": {
+    "message": "Touch ID activé."
+  },
+  "touchIdResetDone": {
+    "message": "Clé supprimée. Elle sera recréée au prochain usage."
+  },
+  "aboutPrivacy": {
+    "message": "MDP Gen ne stocke aucun mot de passe, n'envoie rien sur le réseau et ne contient aucune télémétrie. Seuls ces réglages sont enregistrés."
+  },
+  "aboutRandom": {
+    "message": "Source d'aléa : le générateur cryptographique du navigateur (crypto.getRandomValues), alimenté sur Mac par le générateur matériel d'Apple. Chaque caractère est tiré par rejet, sans biais de modulo."
+  },
+  "optionsReset": {
+    "message": "Rétablir les valeurs par défaut"
+  },
+  "optionsSaved": {
+    "message": "Enregistré."
+  },
+  "previewLine": {
+    "message": "Exemple : $1 — $2 bits, $3.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      },
+      "2": {
+        "content": "$2"
+      },
+      "3": {
+        "content": "$3"
+      }
+    }
+  }
 }

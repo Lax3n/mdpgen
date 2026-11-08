@@ -12,7 +12,7 @@ Nothing is written to disk, nothing goes over the network, no telemetry. The cod
 1. You click a "new password" field (sign-up, change password).
 2. A bubble appears under the field; a 20-character password is already filled in, in the field and in its confirmation.
 3. You choose: **Keep this one**, **Another**, **Don't use**, or **Touch ID and submit**.
-4. With Touch ID, a small window asks for your fingerprint; the form is filled and submitted. Brave then offers to save the password in its manager, as for any password typed by hand.
+4. Touch ID is requested right away, nothing to press: a small window waits for your fingerprint, then the form is filled and submitted. Brave then offers to save the password in its manager, as for any password typed by hand. Cancel and the bubble stays with its buttons; the automatic prompt can be turned off in the options.
 
 Type anything in the field and the suggestion goes away. Nothing shows on sign-in forms (configurable).
 

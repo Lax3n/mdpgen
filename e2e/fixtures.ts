@@ -1,3 +1,4 @@
+/// <reference types="chrome" />
 import { chromium, test as base, type BrowserContext, type CDPSession, type Page } from '@playwright/test';
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -13,6 +14,8 @@ interface Fixtures {
   context: BrowserContext;
   extensionId: string;
   base: string;
+  /** Touch ID demandé dès la proposition (réglage par défaut de l'extension). Désactivé dans les tests sauf demande. */
+  autoTouchId: boolean;
 }
 interface WorkerFixtures {
   server: string;
@@ -40,12 +43,19 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     },
     { scope: 'worker' },
   ],
-  context: async ({}, use) => {
+  autoTouchId: [false, { option: true }],
+  context: async ({ autoTouchId }, use) => {
     const brave = process.env.BRAVE_PATH;
     const context = await chromium.launchPersistentContext('', {
       ...(brave ? { executablePath: brave, headless: false } : { channel: 'chromium', headless: true }),
       args: [`--disable-extensions-except=${EXTENSION_DIR}`, `--load-extension=${EXTENSION_DIR}`],
     });
+    let [worker] = context.serviceWorkers();
+    if (!worker) worker = await context.waitForEvent('serviceworker');
+    await worker.evaluate(async (patch) => {
+      const stored = await chrome.storage.sync.get('settings');
+      await chrome.storage.sync.set({ settings: { ...((stored['settings'] as object | undefined) ?? {}), ...patch } });
+    }, { autoTouchId });
     await use(context);
     await context.close();
   },
@@ -95,3 +105,21 @@ export async function copyCredentials(from: VirtualAuthenticator, to: VirtualAut
 }
 
 export const STRONG = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!#$%&()*+,\-.:;<=>?@[\]^_{}~]).{20}$/;
+
+/** Attend l'envoi du formulaire. Relance la demande si elle est partie avant l'authentificateur virtuel. */
+export async function waitForSubmit(page: Page, confirm: Page): Promise<void> {
+  const done = page.waitForURL(/done\.html/, { timeout: 15_000 }).then(() => 'done' as const, () => 'failed' as const);
+  const late = new Promise<'late'>((resolve) => setTimeout(() => resolve('late'), 4_000));
+  const settled = await Promise.race([done, late]);
+  if (settled === 'late' && !confirm.isClosed()) {
+    await confirm.reload();
+    await page.waitForURL(/done\.html/, { timeout: 15_000 });
+  } else if (settled === 'failed') {
+    throw new Error('Le formulaire n’a pas été envoyé.');
+  }
+}
+
+export async function waitForClosed(context: BrowserContext, confirm: Page, expectedPages: number): Promise<void> {
+  if (!confirm.isClosed()) await confirm.waitForEvent('close', { timeout: 15_000 });
+  await expect.poll(() => context.pages().length, { timeout: 10_000 }).toBe(expectedPages);
+}

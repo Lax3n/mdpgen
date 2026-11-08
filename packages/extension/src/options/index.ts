@@ -22,6 +22,7 @@ const booleans = [
   'showOnAllPasswordFields',
   'submitAfterFill',
   'touchId',
+  'autoTouchId',
 ] as const;
 
 const els = {

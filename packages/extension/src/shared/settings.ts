@@ -8,6 +8,8 @@ export interface Settings extends Preferences {
   showOnAllPasswordFields: boolean;
   /** Proposer Touch ID (WebAuthn plateforme) pour remplir et valider sans afficher le mot de passe. */
   touchId: boolean;
+  /** Demander Touch ID dès que la bulle apparaît, sans appuyer sur le bouton. */
+  autoTouchId: boolean;
   /** Valider le formulaire après le remplissage confirmé par Touch ID. */
   submitAfterFill: boolean;
   /** Durée pendant laquelle le dernier mot de passe proposé reste en mémoire de session (minutes, 0 = jamais). */
@@ -19,6 +21,7 @@ export const DEFAULT_SETTINGS: Readonly<Settings> = Object.freeze({
   autoSuggest: true,
   showOnAllPasswordFields: false,
   touchId: true,
+  autoTouchId: true,
   submitAfterFill: true,
   retainMinutes: 10,
 });
@@ -35,6 +38,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     autoSuggest: bool(input.autoSuggest, DEFAULT_SETTINGS.autoSuggest),
     showOnAllPasswordFields: bool(input.showOnAllPasswordFields, DEFAULT_SETTINGS.showOnAllPasswordFields),
     touchId: bool(input.touchId, DEFAULT_SETTINGS.touchId),
+    autoTouchId: bool(input.autoTouchId, DEFAULT_SETTINGS.autoTouchId),
     submitAfterFill: bool(input.submitAfterFill, DEFAULT_SETTINGS.submitAfterFill),
     retainMinutes:
       Number.isInteger(retain) && retain >= 0 && retain <= 1440 ? retain : DEFAULT_SETTINGS.retainMinutes,

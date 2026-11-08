@@ -1,5 +1,14 @@
 import type { BrowserContext, Page } from '@playwright/test';
-import { addVirtualAuthenticator, copyCredentials, expect, STRONG, test, type VirtualAuthenticator } from '../fixtures.js';
+import {
+  addVirtualAuthenticator,
+  copyCredentials,
+  expect,
+  STRONG,
+  test,
+  waitForClosed,
+  waitForSubmit,
+  type VirtualAuthenticator,
+} from '../fixtures.js';
 
 interface ConfirmOptions {
   verified?: boolean;
@@ -15,24 +24,6 @@ async function openConfirmation(page: Page, options: ConfirmOptions = {}): Promi
   const authenticator = await addVirtualAuthenticator(confirm, options.verified ?? true);
   if (options.source) await copyCredentials(options.source, authenticator);
   return confirm;
-}
-
-/** Attend l'envoi du formulaire. Relance la demande si elle est partie avant l'authentificateur. */
-async function waitForSubmit(page: Page, confirm: Page): Promise<void> {
-  const done = page.waitForURL(/done\.html/, { timeout: 15_000 }).then(() => 'done' as const, () => 'failed' as const);
-  const late = new Promise<'late'>((resolve) => setTimeout(() => resolve('late'), 4_000));
-  const settled = await Promise.race([done, late]);
-  if (settled === 'late' && !confirm.isClosed()) {
-    await confirm.reload();
-    await page.waitForURL(/done\.html/, { timeout: 15_000 });
-  } else if (settled === 'failed') {
-    throw new Error('Le formulaire n’a pas été envoyé.');
-  }
-}
-
-async function waitForClosed(context: BrowserContext, confirm: Page, expectedPages: number): Promise<void> {
-  if (!confirm.isClosed()) await confirm.waitForEvent('close', { timeout: 15_000 });
-  await expect.poll(() => context.pages().length, { timeout: 10_000 }).toBe(expectedPages);
 }
 
 /** Active Touch ID depuis la page d'options ; l'authentificateur de cette page détient la clé. */

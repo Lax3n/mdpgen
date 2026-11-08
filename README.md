@@ -12,7 +12,7 @@ Rien n'est enregistré sur disque, rien ne part sur le réseau, aucune télémé
 1. Vous cliquez dans un champ « nouveau mot de passe » (inscription, changement de mot de passe).
 2. Une bulle apparaît sous le champ ; un mot de passe de 20 caractères est déjà rempli, dans le champ et dans sa confirmation.
 3. Vous choisissez : **Garder celui-ci**, **Un autre**, **Ne pas utiliser**, ou **Touch ID et valider**.
-4. Avec Touch ID, une petite fenêtre demande votre empreinte ; le formulaire est rempli puis envoyé. Brave vous propose alors d'enregistrer le mot de passe dans son gestionnaire, comme pour n'importe quel mot de passe tapé à la main.
+4. Touch ID est demandé aussitôt, sans rien presser : une petite fenêtre attend votre empreinte, puis le formulaire est rempli et envoyé. Brave vous propose alors d'enregistrer le mot de passe dans son gestionnaire, comme pour n'importe quel mot de passe tapé à la main. Annulez et la bulle reste là, avec ses boutons ; ce déclenchement automatique se désactive dans les options.
 
 Si vous tapez quoi que ce soit dans le champ, la proposition s'efface et vous gardez la main. Sur les formulaires de connexion, rien ne s'affiche (réglable).
 

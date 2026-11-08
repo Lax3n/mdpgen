@@ -22,6 +22,8 @@ let settings: Settings | null = null;
 let lastField: HTMLInputElement | null = null;
 let active: Active | null = null;
 const dismissed = new WeakSet<HTMLInputElement>();
+/** Champs pour lesquels Touch ID a déjà été demandé automatiquement : on ne redemande pas après une annulation. */
+const autoRequested = new WeakSet<HTMLInputElement>();
 /** Vrai pendant nos propres écritures, pour ignorer les focus qu'elles provoquent. */
 let writing = false;
 
@@ -80,12 +82,44 @@ function retract(current: Active): void {
   current.filled = [];
 }
 
+/** Vrai si tout le formulaire, mots de passe mis à part, est déjà valide : la validation après Touch ID aboutira. */
+function formReady(field: HTMLInputElement): boolean {
+  const form = field.form;
+  if (!form) return false;
+  for (const element of Array.from(form.elements)) {
+    if (element instanceof HTMLInputElement && element.type === 'password') continue;
+    if ('checkValidity' in element && typeof element.checkValidity === 'function' && !element.checkValidity()) return false;
+  }
+  return true;
+}
+
+/** Demande la confirmation Touch ID au service worker ; le remplissage arrive ensuite par message. */
+async function requestTouchId(submit: boolean): Promise<void> {
+  if (!active) return;
+  bubble.update({ busy: true, error: null });
+  try {
+    await sendToBackground({
+      type: 'mdpgen:confirm-request',
+      password: active.suggestion.password,
+      submit,
+      host: location.host,
+    });
+  } catch (error) {
+    bubble.update({ busy: false, error: error instanceof Error ? error.message : String(error) });
+  }
+}
+
 function propose(field: HTMLInputElement, autofill: boolean): void {
   if (!settings) return;
   const suggestion = suggest(settings, constraintsOf(field));
   active = { field, suggestion, filled: [], accepted: false };
   if (autofill) apply(active);
   bubble.show(field, stateFor(active));
+  // Un doigt suffit : Touch ID est demandé dès la proposition, une seule fois par champ.
+  if (autofill && settings.touchId && settings.autoTouchId && !autoRequested.has(field)) {
+    autoRequested.add(field);
+    void requestTouchId(settings.submitAfterFill && formReady(field));
+  }
 }
 
 function consider(field: HTMLInputElement): void {
@@ -131,17 +165,7 @@ async function onTouchId(): Promise<void> {
     setTimeout(() => finishSubmit(field), 60);
     return;
   }
-  bubble.update({ busy: true, error: null });
-  try {
-    await sendToBackground({
-      type: 'mdpgen:confirm-request',
-      password: active.suggestion.password,
-      submit: settings.submitAfterFill,
-      host: location.host,
-    });
-  } catch (error) {
-    bubble.update({ busy: false, error: error instanceof Error ? error.message : String(error) });
-  }
+  await requestTouchId(settings.submitAfterFill);
 }
 
 function onDismiss(): void {
@@ -221,6 +245,10 @@ function fillFrom(field: HTMLInputElement, password: string, submit: boolean): F
 }
 
 function onMessage(message: Message, _sender: chrome.runtime.MessageSender, sendResponse: (response: unknown) => void): boolean {
+  if (message.type === 'mdpgen:confirm-cancelled') {
+    if (active && bubble.visible) bubble.update({ busy: false, error: null });
+    return false;
+  }
   if (message.type === 'mdpgen:probe') {
     const field = pickField();
     if (!field) return false;

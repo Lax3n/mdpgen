@@ -52,6 +52,10 @@ export interface ConfirmCancel {
   type: 'mdpgen:confirm-cancel';
   requestId: string;
 }
+/** Service worker → script de contenu : la demande Touch ID s'est terminée sans remplissage. */
+export interface ConfirmCancelled {
+  type: 'mdpgen:confirm-cancelled';
+}
 
 export interface RememberRequest {
   type: 'mdpgen:remember';
@@ -72,6 +76,7 @@ export type Message =
   | ConfirmInfoRequest
   | ConfirmVerified
   | ConfirmCancel
+  | ConfirmCancelled
   | RememberRequest
   | ForgetRequest
   | OpenOptionsRequest;
