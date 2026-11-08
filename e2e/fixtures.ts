@@ -106,13 +106,30 @@ export async function copyCredentials(from: VirtualAuthenticator, to: VirtualAut
 
 export const STRONG = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!#$%&()*+,\-.:;<=>?@[\]^_{}~]).{20}$/;
 
+/**
+ * La prochaine fenêtre ouverte dans le contexte, avec un authentificateur virtuel branché dès sa création,
+ * avant que sa page ne lance la demande WebAuthn. `verified` à faux simule un doigt non reconnu.
+ */
+export function nextConfirmWindow(context: BrowserContext, verified = true, source?: VirtualAuthenticator): Promise<Page> {
+  return new Promise((resolve, reject) => {
+    context.once('page', (page) => {
+      addVirtualAuthenticator(page, verified)
+        .then(async (authenticator) => {
+          if (source) await copyCredentials(source, authenticator);
+          resolve(page);
+        })
+        .catch(reject);
+    });
+  });
+}
+
 /** Attend l'envoi du formulaire. Relance la demande si elle est partie avant l'authentificateur virtuel. */
 export async function waitForSubmit(page: Page, confirm: Page): Promise<void> {
   const done = page.waitForURL(/done\.html/, { timeout: 15_000 }).then(() => 'done' as const, () => 'failed' as const);
   const late = new Promise<'late'>((resolve) => setTimeout(() => resolve('late'), 4_000));
   const settled = await Promise.race([done, late]);
   if (settled === 'late' && !confirm.isClosed()) {
-    await confirm.reload();
+    await confirm.reload().catch(() => undefined);
     await page.waitForURL(/done\.html/, { timeout: 15_000 });
   } else if (settled === 'failed') {
     throw new Error('Le formulaire n’a pas été envoyé.');

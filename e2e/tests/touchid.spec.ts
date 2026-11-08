@@ -3,6 +3,7 @@ import {
   addVirtualAuthenticator,
   copyCredentials,
   expect,
+  nextConfirmWindow,
   STRONG,
   test,
   waitForClosed,
@@ -18,12 +19,9 @@ interface ConfirmOptions {
 
 /** Ouvre la fenêtre Touch ID depuis la bulle et y branche l'authentificateur virtuel. */
 async function openConfirmation(page: Page, options: ConfirmOptions = {}): Promise<Page> {
-  const confirmPromise = page.context().waitForEvent('page');
+  const confirmPromise = nextConfirmWindow(page.context(), options.verified ?? true, options.source);
   await page.locator('mdpgen-bubble [data-action="touchid"]').click();
-  const confirm = await confirmPromise;
-  const authenticator = await addVirtualAuthenticator(confirm, options.verified ?? true);
-  if (options.source) await copyCredentials(options.source, authenticator);
-  return confirm;
+  return confirmPromise;
 }
 
 /** Active Touch ID depuis la page d'options ; l'authentificateur de cette page détient la clé. */
@@ -93,7 +91,7 @@ test.describe('Touch ID', () => {
     const confirm = await openConfirmation(page);
     const closed = confirm.isClosed() ? Promise.resolve() : confirm.waitForEvent('close', { timeout: 4_000 }).then(() => undefined);
     const outcome = await closed.then(() => 'closed' as const, () => 'late' as const);
-    if (outcome === 'late') await confirm.reload();
+    if (outcome === 'late') await confirm.reload().catch(() => undefined);
     await waitForClosed(context, confirm, pagesBefore);
     expect(page.url()).toContain('signup.html');
     expect(await page.inputValue('#password')).toMatch(STRONG);
@@ -112,10 +110,10 @@ test.describe('Touch ID', () => {
     // Authentificateur présent mais vérification refusée : doigt non reconnu, puis « Annuler ».
     const confirm = await openConfirmation(page, { verified: false });
     const retry = confirm.locator('#retry');
-    if (!(await retry.isVisible({ timeout: 4_000 }).catch(() => false))) await confirm.reload();
+    if (!(await retry.isVisible({ timeout: 4_000 }).catch(() => false))) await confirm.reload().catch(() => undefined);
     await expect(retry).toBeVisible({ timeout: 10_000 });
     await expect(confirm.locator('#status')).toContainText(/Annulé|Cancelled/);
-    await confirm.locator('#cancel').click();
+    await confirm.locator('#cancel').click().catch(() => undefined);
     await waitForClosed(context, confirm, pagesBefore);
     expect(page.url()).toContain('signup.html');
     expect(await page.inputValue('#password')).toBe(before);
